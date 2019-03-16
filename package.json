@@ -2,6 +2,7 @@
   "name": "ssrer",
   "version": "1.0.0",
   "main": "index.js",
+  "typings": "./index.d.ts",
   "license": "MIT",
   "scripts": {
     "dev:build": "taskr",
@@ -10,10 +11,12 @@
   },
   "devDependencies": {
     "@taskr/typescript": "^1.1.0",
+    "@types/cheerio": "^0.22.11",
     "@types/react-dom": "^16.8.2",
     "@types/webpack": "^4.4.25",
     "@types/webpack-dev-middleware": "^2.0.2",
     "chalk": "^2.4.2",
+    "cheerio": "^1.0.0-rc.2",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
     "taskr": "^1.1.0",

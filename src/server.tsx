@@ -1,20 +1,31 @@
 import * as React from 'react'
 import * as http from 'http'
+import * as cheerio from 'cheerio'
+import { readFileSync } from 'fs'
 import { renderToString } from 'react-dom/server'
 import App from './App'
 
-let i = 0
+interface ServerOpts {
+  container: string
+  clientChunkPath: string
+  htmlPath: string
+  port?: number
+}
 
 class Server {
 
   private app: http.Server
   private port = 3030
   private clientChunkPath: string
+  private container: string
+  private originalHTML: string
 
-  constructor(clientChunkPath: string, port?: number) {
-    this.clientChunkPath = clientChunkPath
-    if (port) {
-      this.port = port
+  constructor(opts: ServerOpts) {
+    this.clientChunkPath = opts.clientChunkPath
+    this.container = opts.container
+    this.originalHTML = readFileSync(opts.htmlPath, 'utf-8')
+    if (opts.port) {
+      this.port = opts.port
     }
   }
 
@@ -33,17 +44,20 @@ class Server {
     if (req.url === '/') {
       const content = renderToString(<App />)
       res.setHeader('Content-Type', 'text/html')
-      res.end(`
-        <html>
-          <body>
-            <div class="app-container">${content}</div>
-            <script src='${this.clientChunkPath}'></script>
-          </body>
-        </html>
-      `)
+      const html = this.renderHTML(content)
+      res.end(html)
     } else {
       res.end()
     }
+  }
+
+  private renderHTML = (content: string) => {
+    const $ = cheerio.load(this.originalHTML)
+    $(this.container).append(content)
+    $('body').append(`
+      <script type='text/javascript' src='${this.clientChunkPath}'></script>
+    `)
+    return $.html()
   }
 }
 

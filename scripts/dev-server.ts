@@ -8,6 +8,8 @@ import { genWebpackConfig } from './webpack-config'
 import chalk from 'chalk'
 
 const DEV_SERVER_PORT = 8080
+const APP_SERVER_PORT = 3030
+const htmlPath = join(process.cwd(), 'src/index.html')
 
 const serverDevConfig = genWebpackConfig({ isDev: true, isServer: true })
 const clientDevConfig = genWebpackConfig({ isDev: true, isServer: false })
@@ -50,7 +52,7 @@ const app = http.createServer((req: http.IncomingMessage, res: http.ServerRespon
 
 app.listen(DEV_SERVER_PORT, () => {
   console.log(
-    chalk.green('Webpack 开发服务运行在 http://localhost:8080')
+    chalk.green(`Webpack 开发服务运行在 http://localhost:${DEV_SERVER_PORT}`)
   )
 })
 
@@ -66,12 +68,23 @@ async function startServer(stats: webpack.Stats) {
     )
   }
   const chunkName = join(outputPath, assets.main)
-  const Server = require(chunkName).default
-  server = new Server(clientChunkPath, 3030)
+  const Server = require(chunkName).default 
+  server = new Server({
+    container: '.app-container',
+    htmlPath,
+    clientChunkPath,
+    port: APP_SERVER_PORT,
+  })
   server.start()
   console.log(
-    chalk.green('启动成功，http://localhost:3030')
+    chalk.green(`启动成功，http://localhost:${APP_SERVER_PORT}`)
   )
   lastChunkName && unlink(lastChunkName, () => void 0)
   lastChunkName = chunkName
+  setTimeout(() => {
+    console.clear()
+    console.log(
+      chalk.green(`启动成功，http://localhost:${APP_SERVER_PORT}`)
+    )
+  }, 1000)
 }
