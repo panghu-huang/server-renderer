@@ -6,18 +6,18 @@ import { URL } from 'url'
 import { StaticRouter, Route, RouteProps, matchPath } from 'react-router-dom'
 import { renderToString } from 'react-dom/server'
 import { getDevConfig } from 'scripts/dev-config'
-import { RenderOptions } from './types'
+import { RenderOptions, AppContainerProps } from './types'
 
 const devConfig = getDevConfig()
 
 class Server {
 
-  private readonly port = 3030
   private app: http.Server
+  private readonly port = 3030
   private readonly clientChunkPath: URL
   private readonly container: string
   private readonly originalHTML: string
-  private readonly AppContainer: React.ComponentType<RouteProps>
+  private readonly AppContainer: React.ComponentType<AppContainerProps>
   private readonly routes: RouteProps[]
 
   constructor(opts: RenderOptions) {
@@ -51,7 +51,6 @@ class Server {
     })
     if (isMatched) {
       const AppContainer = this.AppContainer
-      const routes = this.routes
       const content = renderToString(
         <StaticRouter 
           location={req.url} 

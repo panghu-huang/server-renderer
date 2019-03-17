@@ -6,9 +6,9 @@ import { unlink } from 'fs'
 import { genWebpackConfig } from './webpack-config'
 import chalk from 'chalk'
 
-const appDirectory = process.cwd()
+const rootDirectory = process.cwd()
 const serverDevConfig = genWebpackConfig({ 
-  rootDirectory: appDirectory, isDev: true, isServer: true, 
+  rootDirectory, isDev: true, isServer: true, 
 })
 const serverCompiler = webpack(serverDevConfig)
 const serverDevMiddleware = WebpackDevMiddleware(serverCompiler, {

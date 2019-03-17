@@ -6,10 +6,10 @@ import { getDevConfig } from './dev-config'
 import chalk from 'chalk'
 import './server-compiler'
 
-const appDirectory = process.cwd()
+const rootDirectory = process.cwd()
 const devConfig = getDevConfig()
 const clientDevConfig = genWebpackConfig({ 
-  rootDirectory: appDirectory, isDev: true, isServer: false 
+  rootDirectory, isDev: true, isServer: false 
 })
 const clientCompiler = webpack(clientDevConfig)
 
