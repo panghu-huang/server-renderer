@@ -2,9 +2,10 @@ import * as React from 'react'
 import { hydrate } from 'react-dom'
 import { Router, Route, Switch } from 'react-router-dom'
 import { createBrowserHistory } from 'history'
-import { RenderOptions } from './types'
 
-export function render(opts: RenderOptions) {
+import ServerRenderer = require('index')
+
+export function render(opts: ServerRenderer.RenderOptions) {
   const history = createBrowserHistory()
   const AppContainer = opts.AppContainer || React.Fragment
   const routes = opts.routes

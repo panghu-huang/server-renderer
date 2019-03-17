@@ -6,7 +6,8 @@ import { URL } from 'url'
 import { StaticRouter, Route, RouteProps, matchPath } from 'react-router-dom'
 import { renderToString } from 'react-dom/server'
 import { getDevConfig } from 'scripts/dev-config'
-import { RenderOptions, AppContainerProps } from './types'
+
+import ServerRenderer = require('index')
 
 const devConfig = getDevConfig()
 
@@ -17,10 +18,10 @@ class Server {
   private readonly clientChunkPath: URL
   private readonly container: string
   private readonly originalHTML: string
-  private readonly AppContainer: React.ComponentType<AppContainerProps>
+  private readonly AppContainer: React.ComponentType<ServerRenderer.AppContainerProps>
   private readonly routes: RouteProps[]
 
-  constructor(opts: RenderOptions) {
+  constructor(opts: ServerRenderer.RenderOptions) {
     this.clientChunkPath = new URL(
       devConfig.clientChunkName,
       `http://localhost:${devConfig.webpackServerPort}${devConfig.clientPublicPath}`
@@ -86,7 +87,7 @@ class Server {
 
 }
 
-export function render(opts: RenderOptions) {
+export function render(opts: ServerRenderer.RenderOptions) {
   const server = new Server(opts)
   server.start()
 }

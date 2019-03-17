@@ -21,7 +21,6 @@ const clientDevMiddleware = WebpackDevMiddleware(clientCompiler, {
 
 const app = http.createServer((req: http.IncomingMessage, res: http.ServerResponse) => {
   clientDevMiddleware(req, res, () => {
-    console.log('next')
     res.end()
   })
 })
