@@ -1,24 +1,35 @@
 {
   "name": "ssrer",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "lib/index.js",
   "typings": "./index.d.ts",
   "license": "MIT",
+  "files": [
+    "client.js",
+    "server.js"
+  ],
   "scripts": {
-    "dev:build": "taskr",
-    "dev:start": "node build/scripts/dev-server.js",
-    "dev": "yarn dev:build && yarn dev:start"
+    "build:script": "taskr",
+    "build:entry": "rollup --config config/rollup.entry.js",
+    "build:server": "rollup --config config/rollup.server.js",
+    "build:client": "rollup --config config/rollup.client.js",
+    "build": "yarn build:client && yarn build:server && yarn build:entry && yarn build:script"
   },
   "devDependencies": {
     "@taskr/typescript": "^1.1.0",
     "@types/cheerio": "^0.22.11",
     "@types/react-dom": "^16.8.2",
+    "@types/react-router-dom": "^4.3.1",
     "@types/webpack": "^4.4.25",
     "@types/webpack-dev-middleware": "^2.0.2",
     "chalk": "^2.4.2",
     "cheerio": "^1.0.0-rc.2",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
+    "react-router-dom": "^4.4.0",
+    "rollup": "^1.6.0",
+    "rollup-plugin-typescript": "^1.0.0",
+    "rollup-plugin-uglify": "^6.0.2",
     "taskr": "^1.1.0",
     "ts-loader": "^5.3.3",
     "typescript": "^3.3.3333",
@@ -27,6 +38,7 @@
   },
   "peerDependencies": {
     "react": "^16.8.4",
-    "react-dom": "^16.8.4"
+    "react-dom": "^16.8.4",
+    "react-router-dom": "^4.4.0"
   }
 }

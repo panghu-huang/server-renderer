@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "rootDir": ".",
     "module": "commonjs",
     "target": "es6",
     "jsx": "react"

@@ -1,4 +1,4 @@
-
+import { RenderOptions } from 'core/types'
 
 declare namespace ItSSR {
 
@@ -11,6 +11,8 @@ declare namespace ItSSR {
   class Server {
     constructor(opts: ServerOpts);
   }
+
+  export function render(opts: RenderOptions): void;
 
 }
 
