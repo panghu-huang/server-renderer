@@ -27,7 +27,7 @@ const app = http.createServer((req: http.IncomingMessage, res: http.ServerRespon
 
 app.listen(devConfig.webpackServerPort, () => {
   console.log(
-    chalk.green(`Webpack 开发服务运行在 http://localhost:${devConfig.webpackServerPort}`)
+    chalk.green(`正在启动开发服务...`)
   )
 })
 

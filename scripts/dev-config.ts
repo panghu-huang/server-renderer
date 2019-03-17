@@ -21,7 +21,7 @@ const rootDirectory = process.cwd()
 export function getDevConfig(): DevConfiguration {
   return {
     clientChunkName: 'client.js',
-    serverChunkName: 'server.[hash:4].js',
+    serverChunkName: 'server.js',
     webpackServerPort: DEFAULT_WEBPACK_SERVER_PORT,
     devServerPort: DEFAULT_DEV_SERVER_PORT,
     clientPublicPath: DEFAULT_CLIENT_PUBLIC_PATH,

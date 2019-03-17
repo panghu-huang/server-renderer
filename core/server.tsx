@@ -33,7 +33,7 @@ class Server {
   }
 
   public start() {
-    this.app = http.createServer(this.handleRequest)
+    this.app = http.createServer(this.handleRequest.bind(this))
     this.app.listen(this.port, () => {
       console.log('Server listen on: http://localhost:' + this.port)
     })
@@ -45,7 +45,7 @@ class Server {
     }
   }
 
-  private handleRequest = (req: http.IncomingMessage, res: http.ServerResponse) => {
+  private handleRequest(req: http.IncomingMessage, res: http.ServerResponse) {
     const routes = this.routes
     const isMatched = routes.some(route => {
       return !!matchPath(req.url, route)
@@ -76,7 +76,7 @@ class Server {
     }
   }
 
-  private renderHTML = (content: string) => {
+  private renderHTML(content: string) {
     const $ = cheerio.load(this.originalHTML)
     $(this.container).append(content)
     $('body').append(`
@@ -91,3 +91,5 @@ export function render(opts: ServerRenderer.RenderOptions) {
   const server = new Server(opts)
   server.start()
 }
+
+export * from 'react-router-dom'

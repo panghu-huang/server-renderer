@@ -36,7 +36,7 @@ export function genWebpackConfig(opts: GenerateWebpackOpts) {
       filename: isServer 
         ? devConfig.serverChunkName 
         : devConfig.clientChunkName,
-      libraryTarget: isServer ? 'commonjs2' : undefined,
+      libraryTarget: isServer ? 'commonjs2' : 'umd',
       pathinfo: false,
     },
     cache: false,
@@ -107,7 +107,7 @@ function getLocalIdent(
   options
 ) {
   const fileNameOrFolder = context.resourcePath.match(
-    /index\.module\.(css|scss|sass)$/
+    /index\.m\.(css|scss|sass)$/
   )
     ? '[folder]'
     : '[name]'
@@ -122,5 +122,5 @@ function getLocalIdent(
     fileNameOrFolder + '_' + localName + '__' + hash,
     options
   )
-  return className.replace('.module_', '_')
+  return className.replace('.m', '_')
 }

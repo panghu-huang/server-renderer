@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { hydrate } from 'react-dom'
-import { Router, Route, Switch } from 'react-router-dom'
+import { Route, Switch, Router } from 'react-router-dom'
 import { createBrowserHistory } from 'history'
 
 import ServerRenderer = require('index')
@@ -11,19 +11,18 @@ export function render(opts: ServerRenderer.RenderOptions) {
   const routes = opts.routes
   const app = (
     <Router history={history}>
-      <Switch>
-        <AppContainer>
+      <AppContainer>
+        <Switch>
           {routes.map((route, index) => {
             return (
-              <Route
-                key={index}
-                {...route}
-              />
+              <Route key={index} {...route}/>
             )
           })}
-        </AppContainer>
-      </Switch>
+        </Switch>
+      </AppContainer>
     </Router>
   )
   hydrate(app, document.querySelector(opts.container))
 }
+
+export * from 'react-router-dom'
