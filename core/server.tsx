@@ -3,15 +3,10 @@ import * as http from 'http'
 import * as cheerio from 'cheerio'
 import { readFileSync } from 'fs'
 import { URL } from 'url'
-import { 
-  StaticRouter, 
-  Route, 
-  RouteProps, 
-  matchPath,
-  Switch
-} from 'react-router-dom'
+import { StaticRouter, RouteProps, matchPath } from 'react-router-dom'
 import { renderToString } from 'react-dom/server'
 import { getDevConfig } from 'scripts/dev-config'
+import Container from './Container'
 
 import ServerRenderer = require('index')
 
@@ -60,34 +55,20 @@ class Server {
     if (matchedIndex !== -1) {
       const AppContainer = this.AppContainer
       const matchedRoute = routes[matchedIndex]
-      const pageProps = await this.getInitialProps(matchedRoute, pathname)
-      const emptyProps = {}
+      const pageProps = await this.getInitialProps(AppContainer, pathname, matchedRoute)
       const content = renderToString(
         <StaticRouter 
           location={pathname} 
           context={{}}>
-          <Switch>
-            <AppContainer>
-              {routes.map(({ component, ...routeProps }, index) => {
-                const Page = component
-                const initialProps = index === matchedIndex
-                  ? pageProps
-                  : emptyProps
-                return (
-                  <Route 
-                    key={index} 
-                    {...routeProps} 
-                    render={props => (
-                      <Page {...props} {...initialProps}/>
-                    )}
-                  />
-                )
-              })}
-            </AppContainer>
-          </Switch>
+          <Container 
+            routes={routes}
+            matchedIndex={matchedIndex}
+            pageProps={pageProps}
+            AppContainer={AppContainer}
+          />
         </StaticRouter>
       )
-      const html = this.renderHTML(content)
+      const html = this.renderHTML(content, pageProps)
       res.setHeader('Content-Type', 'text/html')
       res.end(html)
     } else {
@@ -95,21 +76,28 @@ class Server {
     }
   }
 
-  private renderHTML(content: string) {
+  private renderHTML(content: string, pageProps: object) {
     const $ = cheerio.load(this.originalHTML)
-    $(this.container).append(content)
+    $(this.container).html(content)
+    $('body').append(`
+      <script type='text/javascript'>
+          __APP_DATA__="${encodeURIComponent(JSON.stringify({ pageProps }))}"
+      </script>
+    `)
     $('body').append(`
       <script type='text/javascript' src='${this.clientChunkPath}'></script>
     `)
     return $.html()
   }
 
-  private async getInitialProps(route: RouteProps, pathname: string) {
-    const { component } = route
-    if (component.getInitialProps) {
-      return {
-        [component.displayName]: await component.getInitialProps(pathname),
-      }
+  private async getInitialProps(
+    AppContainer: React.ComponentType<ServerRenderer.AppContainerProps>,
+    pathname: string,
+    matchedRoute: RouteProps
+  ) {
+    const { getInitialProps } = AppContainer
+    if (getInitialProps) {
+      return await getInitialProps({ pathname, route: matchedRoute })
     }
     return {}
   }

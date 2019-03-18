@@ -5,12 +5,25 @@ import { History } from 'history'
 declare global {
   namespace React {
     interface ComponentClass {
-      getInitialProps?: (url: string) => object
+      getInitialProps?: (...args: any[]) => object
     }
     interface FunctionComponent {
-      getInitialProps?: (url: string) => object
+      getInitialProps?: (...args: any[]) => object
     }
   }
+
+  interface Window {
+    __APP_DATA__: string
+  }
+}
+
+export interface GlobalAppData {
+  pageProps: object
+}
+
+export interface GetInitialPropsParams {
+  pathname: string
+  route: RouteProps
 }
 
 export interface AppContainerProps {
