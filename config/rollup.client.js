@@ -1,5 +1,6 @@
 import path from 'path'
 import typescript from 'rollup-plugin-typescript'
+import { uglify } from 'rollup-plugin-uglify'
 
 const resolve = absolutePath => path.resolve(__dirname, '..', absolutePath)
 
@@ -8,9 +9,10 @@ export default {
   output: {
     file: resolve('lib/client.js'),
     format: 'umd',
-    name: 'it-ssr',
+    name: 'ServerRenderer',
   },
   plugins: [
-    typescript()
+    typescript({ target: 'es5' }),
+    uglify()
   ],
 }

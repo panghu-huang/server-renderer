@@ -1,6 +1,6 @@
 {
   "name": "server-renderer",
-  "version": "1.0.0",
+  "version": "0.0.2",
   "main": "lib/index.js",
   "typings": "./index.d.ts",
   "license": "MIT",
@@ -23,9 +23,6 @@
     "isomorphic-style-loader": "^5.0.1",
     "loader-utils": "^1.2.3",
     "node-sass": "^4.11.0",
-    "rollup": "^1.6.0",
-    "rollup-plugin-typescript": "^1.0.0",
-    "rollup-plugin-uglify": "^6.0.2",
     "sass-loader": "^7.1.0",
     "style-loader": "^0.23.1",
     "ts-loader": "^5.3.3",
@@ -35,6 +32,9 @@
     "react-router-dom": "^4.4.0"
   },
   "devDependencies": {
+    "rollup": "^1.6.0",
+    "rollup-plugin-typescript": "^1.0.0",
+    "rollup-plugin-uglify": "^6.0.2",
     "@taskr/typescript": "^1.1.0",
     "@types/cheerio": "^0.22.11",
     "@types/loader-utils": "^1.1.3",

@@ -3,7 +3,13 @@ import * as http from 'http'
 import * as cheerio from 'cheerio'
 import { readFileSync } from 'fs'
 import { URL } from 'url'
-import { StaticRouter, Route, RouteProps, matchPath } from 'react-router-dom'
+import { 
+  StaticRouter, 
+  Route, 
+  RouteProps, 
+  matchPath,
+  Switch
+} from 'react-router-dom'
 import { renderToString } from 'react-dom/server'
 import { getDevConfig } from 'scripts/dev-config'
 
@@ -45,27 +51,40 @@ class Server {
     }
   }
 
-  private handleRequest(req: http.IncomingMessage, res: http.ServerResponse) {
+  private async handleRequest(req: http.IncomingMessage, res: http.ServerResponse) {
     const routes = this.routes
-    const isMatched = routes.some(route => {
-      return !!matchPath(req.url, route)
+    const pathname = req.url
+    const matchedIndex = routes.findIndex(route => {
+      return !!matchPath(pathname, route)
     })
-    if (isMatched) {
+    if (matchedIndex !== -1) {
       const AppContainer = this.AppContainer
+      const matchedRoute = routes[matchedIndex]
+      const pageProps = await this.getInitialProps(matchedRoute, pathname)
+      const emptyProps = {}
       const content = renderToString(
         <StaticRouter 
-          location={req.url} 
+          location={pathname} 
           context={{}}>
-          <AppContainer>
-            {routes.map((route, index) => {
-              return (
-                <Route 
-                  key={index}
-                  {...route}
-                />
-              )
-            })}
-          </AppContainer>
+          <Switch>
+            <AppContainer>
+              {routes.map(({ component, ...routeProps }, index) => {
+                const Page = component
+                const initialProps = index === matchedIndex
+                  ? pageProps
+                  : emptyProps
+                return (
+                  <Route 
+                    key={index} 
+                    {...routeProps} 
+                    render={props => (
+                      <Page {...props} {...initialProps}/>
+                    )}
+                  />
+                )
+              })}
+            </AppContainer>
+          </Switch>
         </StaticRouter>
       )
       const html = this.renderHTML(content)
@@ -83,6 +102,16 @@ class Server {
       <script type='text/javascript' src='${this.clientChunkPath}'></script>
     `)
     return $.html()
+  }
+
+  private async getInitialProps(route: RouteProps, pathname: string) {
+    const { component } = route
+    if (component.getInitialProps) {
+      return {
+        [component.displayName]: await component.getInitialProps(pathname),
+      }
+    }
+    return {}
   }
 
 }

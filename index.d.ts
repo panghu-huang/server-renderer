@@ -1,5 +1,17 @@
+import* as React from 'react'
 import { RouteProps } from 'react-router-dom'
 import { History } from 'history'
+
+declare global {
+  namespace React {
+    interface ComponentClass {
+      getInitialProps?: (url: string) => object
+    }
+    interface FunctionComponent {
+      getInitialProps?: (url: string) => object
+    }
+  }
+}
 
 export interface AppContainerProps {
   children: React.ReactNode
