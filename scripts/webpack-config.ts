@@ -27,7 +27,7 @@ export function genWebpackConfig(opts: GenerateWebpackOpts) {
     target: isServer ? 'node' : 'web',
     entry: resolve('src/index.tsx'),
     output: {
-      path: resolve(outputDirectory),
+      path: outputDirectory,
       publicPath: isServer 
       ? config.serverPublicPath 
       : config.clientPublicPath,
@@ -120,7 +120,7 @@ function getBundlePlugins(
             filename: '[name].css',
             chunkFilename: '[id].css',
           }),
-          new BundleAnalyzerPlugin(),
+          // new BundleAnalyzerPlugin(),
           new webpack.optimize.ModuleConcatenationPlugin(),
           new webpack.optimize.AggressiveMergingPlugin(),
           new HtmlWebpackPlugin({

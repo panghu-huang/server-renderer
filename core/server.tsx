@@ -1,5 +1,6 @@
 import * as React from 'react'
-import * as http from 'http'
+import * as Koa from 'koa'
+import * as Router from 'koa-router'
 import * as cheerio from 'cheerio'
 import { readFileSync } from 'fs'
 import { URL } from 'url'
@@ -7,6 +8,8 @@ import { StaticRouter, matchPath, RouteProps } from 'react-router-dom'
 import { renderToString } from 'react-dom/server'
 import { getConfig } from 'scripts/config'
 import Container from './Container'
+// @ts-ignore
+import send from 'koa-send'
 
 import ServerRenderer = require('index')
 
@@ -15,7 +18,6 @@ const isDev = process.env.NODE_ENV === 'development'
 
 class Server {
 
-  private app: http.Server
   private readonly port = 3030
   private readonly clientChunkPath: URL
   private readonly container: string
@@ -36,21 +38,34 @@ class Server {
   }
 
   public start() {
-    this.app = http.createServer(this.handleRequest.bind(this))
-    this.app.listen(this.port, () => {
+    const app = new Koa()
+    const router = new Router()
+    if (!isDev) {
+      const staticDirName = config.staticDirName
+      const staticDirectory = config.staticDirectory
+      app.use(async (ctx, next) => {
+        const path = ctx.path
+        if(path.startsWith(`/${staticDirName}/`)) {
+          await send(
+            ctx, 
+            path.replace(`/${staticDirName}/`, ''), 
+            { root: staticDirectory }
+          )
+        } else {
+          await next()
+        }
+      })
+    }
+    router.get('*', this.handleRequest.bind(this))
+    app.use(router.routes())
+    app.listen(this.port, () => {
       console.log('Server listen on: http://localhost:' + this.port)
     })
   }
 
-  public async close() {
-    if (this.app) {
-      await this.app.close()
-    }
-  }
-
-  private async handleRequest(req: http.IncomingMessage, res: http.ServerResponse) {
+  private async handleRequest(ctx: Koa.ParameterizedContext) {
     const routes = this.routes
-    const pathname = req.url
+    const pathname = ctx.url
     const matchedIndex = routes.findIndex(route => {
       return !!matchPath(pathname, route)
     })
@@ -70,20 +85,18 @@ class Server {
           />
         </StaticRouter>
       )
-      const html = this.renderHTML(content, pageProps)
-      res.setHeader('Content-Type', 'text/html')
-      res.end(html)
+      ctx.body = this.renderHTML(content, pageProps)
     } else {
-      res.end('Page not found')
+      ctx.body = 'Page not found'
     }
   }
 
   private renderHTML(content: string, pageProps: object) {
     const $ = cheerio.load(this.originalHTML)
     $(this.container).html(content)
-    $('body').append(`
+    $('head').append(`
       <script type='text/javascript'>
-          __APP_DATA__="${encodeURIComponent(JSON.stringify({ pageProps }))}"
+          __APP_DATA__='${encodeURIComponent(JSON.stringify({ pageProps }))}'
       </script>
     `)
     if (isDev) {

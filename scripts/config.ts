@@ -14,6 +14,8 @@ export interface Configuration {
   clientChunkName: string
   serverChunkName: string
   htmlTemplatePath: string
+  buildDirName: string
+  staticDirName: string
   buildDirectory: string
   staticDirectory: string
   htmlFilename: string
@@ -24,7 +26,8 @@ const rootDirectory = process.cwd()
 
 export function getConfig(): Configuration {
   const htmlFilename = 'client.html'
-  const staticDirectory = 'static'
+  const staticDirName = 'static'
+  const buildDirName = 'build'
   return {
     clientChunkName: 'app.js',
     serverChunkName: 'server.js',
@@ -34,8 +37,10 @@ export function getConfig(): Configuration {
     serverPublicPath: DEFAULT_SERVER_PUBLIC_PATH,
     htmlTemplatePath: join(rootDirectory, 'src/index.html'),
     htmlFilename,
-    htmlPath: join(rootDirectory, staticDirectory, 'client.html'),
-    buildDirectory: 'build',
-    staticDirectory,
+    htmlPath: join(rootDirectory, staticDirName, 'client.html'),
+    buildDirName,
+    staticDirName,
+    buildDirectory: join(rootDirectory, buildDirName),
+    staticDirectory: join(rootDirectory, staticDirName),
   }
 }
