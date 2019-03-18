@@ -2,12 +2,12 @@ import * as http from 'http'
 import * as webpack from 'webpack'
 import * as WebpackDevMiddleware from 'webpack-dev-middleware'
 import { genWebpackConfig } from './webpack-config'
-import { getDevConfig } from './dev-config'
+import { getConfig } from './config'
 import chalk from 'chalk'
 import './server-compiler'
 
 const rootDirectory = process.cwd()
-const devConfig = getDevConfig()
+const config = getConfig()
 const clientDevConfig = genWebpackConfig({ 
   rootDirectory, isDev: true, isServer: false,
 })
@@ -25,7 +25,7 @@ const app = http.createServer((req: http.IncomingMessage, res: http.ServerRespon
   })
 })
 
-app.listen(devConfig.webpackServerPort, () => {
+app.listen(config.webpackServerPort, () => {
   console.log(
     chalk.green(`正在启动开发服务...`)
   )

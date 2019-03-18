@@ -6,9 +6,9 @@ const DEFAULT_DEV_SERVER_PORT = 3030
 const DEFAULT_CLIENT_PUBLIC_PATH = '/static/'
 const DEFAULT_SERVER_PUBLIC_PATH = '/'
 
-export interface DevConfiguration {
+export interface Configuration {
   webpackServerPort: number
-  devServerPort: number
+  serverPort: number
   clientPublicPath: string
   serverPublicPath: string
   clientChunkName: string
@@ -22,18 +22,20 @@ export interface DevConfiguration {
 
 const rootDirectory = process.cwd()
 
-export function getDevConfig(): DevConfiguration {
+export function getConfig(): Configuration {
+  const htmlFilename = 'client.html'
+  const staticDirectory = 'static'
   return {
     clientChunkName: 'app.js',
     serverChunkName: 'server.js',
     webpackServerPort: DEFAULT_WEBPACK_SERVER_PORT,
-    devServerPort: DEFAULT_DEV_SERVER_PORT,
+    serverPort: DEFAULT_DEV_SERVER_PORT,
     clientPublicPath: DEFAULT_CLIENT_PUBLIC_PATH,
     serverPublicPath: DEFAULT_SERVER_PUBLIC_PATH,
     htmlTemplatePath: join(rootDirectory, 'src/index.html'),
-    htmlFilename: 'client.html',
-    htmlPath: join(rootDirectory, 'client.html'),
+    htmlFilename,
+    htmlPath: join(rootDirectory, staticDirectory, 'client.html'),
     buildDirectory: 'build',
-    staticDirectory: 'static',
+    staticDirectory,
   }
 }

@@ -5,12 +5,13 @@ import { readFileSync } from 'fs'
 import { URL } from 'url'
 import { StaticRouter, matchPath, RouteProps } from 'react-router-dom'
 import { renderToString } from 'react-dom/server'
-import { getDevConfig } from 'scripts/dev-config'
+import { getConfig } from 'scripts/config'
 import Container from './Container'
 
 import ServerRenderer = require('index')
 
-const devConfig = getDevConfig()
+const config = getConfig()
+const isDev = process.env.NODE_ENV === 'development'
 
 class Server {
 
@@ -24,13 +25,14 @@ class Server {
 
   constructor(opts: ServerRenderer.RenderOptions) {
     this.clientChunkPath = new URL(
-      devConfig.clientChunkName,
-      `http://localhost:${devConfig.webpackServerPort}${devConfig.clientPublicPath}`
+      config.clientChunkName,
+      `http://localhost:${config.webpackServerPort}${config.clientPublicPath}`
     )
     this.container = opts.container
     this.AppContainer = opts.AppContainer || React.Fragment
     this.routes = opts.routes
-    this.originalHTML = readFileSync(devConfig.htmlPath, 'utf-8')
+    const htmlPath = isDev ? config.htmlTemplatePath : config.htmlPath
+    this.originalHTML = readFileSync(htmlPath, 'utf-8')
   }
 
   public start() {
@@ -84,9 +86,11 @@ class Server {
           __APP_DATA__="${encodeURIComponent(JSON.stringify({ pageProps }))}"
       </script>
     `)
-    $('body').append(`
-      <script type='text/javascript' src='${this.clientChunkPath}'></script>
-    `)
+    if (isDev) {
+      $('body').append(`
+        <script type='text/javascript' src='${this.clientChunkPath}'></script>
+      `)
+    }
     return $.html()
   }
 

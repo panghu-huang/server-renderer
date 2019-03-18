@@ -2,11 +2,11 @@ import * as webpack from 'webpack'
 import { existsSync, rmdirSync } from 'fs'
 import { join } from 'path'
 import { genWebpackConfig } from './webpack-config'
-import { getDevConfig } from './dev-config'
+import { getConfig } from './config'
 import chalk from 'chalk'
 
 const rootDirectory = process.cwd()
-const devConfig = getDevConfig()
+const config = getConfig()
 const clientConfig = genWebpackConfig({ isDev: false, isServer: false, rootDirectory, })
 const serverConfig = genWebpackConfig({ isDev: false, isServer: true, rootDirectory, })
 

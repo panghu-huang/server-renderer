@@ -1,12 +1,11 @@
 import * as path from 'path'
+import * as webpack from 'webpack'
 import * as MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import * as HtmlWebpackPlugin from 'html-webpack-plugin'
 import * as ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin'
-import { Configuration } from 'webpack'
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
 import { getHashDigest, interpolateName } from 'loader-utils'
-import { getDevConfig, DevConfiguration } from './dev-config'
-import webpack = require('webpack');
+import { getConfig, Configuration } from './config'
 
 export interface GenerateWebpackOpts {
   rootDirectory: string
@@ -16,13 +15,13 @@ export interface GenerateWebpackOpts {
 
 export function genWebpackConfig(opts: GenerateWebpackOpts) {
   const { rootDirectory, isDev = false, isServer = false } = opts
-  const devConfig = getDevConfig()
+  const config = getConfig()
   const resolve = absolutePath => path.resolve(rootDirectory, absolutePath)
 
-  const outputDirectory = getOutputDirectoty(devConfig, isDev, isServer)
-  const plugins = getBundlePlugins(opts, devConfig)
+  const outputDirectory = getOutputDirectoty(config, isDev, isServer)
+  const plugins = getBundlePlugins(opts, config)
 
-  const config: Configuration = {
+  const webpackConfig: webpack.Configuration = {
     stats: isDev ? 'errors-only' : 'normal',
     mode: isDev ? 'development' : 'production',
     target: isServer ? 'node' : 'web',
@@ -30,11 +29,11 @@ export function genWebpackConfig(opts: GenerateWebpackOpts) {
     output: {
       path: resolve(outputDirectory),
       publicPath: isServer 
-      ? devConfig.serverPublicPath 
-      : devConfig.clientPublicPath,
+      ? config.serverPublicPath 
+      : config.clientPublicPath,
       filename: isServer 
-        ? devConfig.serverChunkName 
-        : devConfig.clientChunkName,
+        ? config.serverChunkName 
+        : config.clientChunkName,
       libraryTarget: isServer ? 'commonjs2' : 'umd',
       pathinfo: false,
     },
@@ -89,7 +88,7 @@ export function genWebpackConfig(opts: GenerateWebpackOpts) {
   }
   
   if (!isServer) {
-    config.node = {
+    webpackConfig.node = {
       dgram: 'empty',
       fs: 'empty',
       net: 'empty',
@@ -98,12 +97,12 @@ export function genWebpackConfig(opts: GenerateWebpackOpts) {
     }
   }
 
-  return config
+  return webpackConfig
 }
 
 function getBundlePlugins(
   { rootDirectory, isDev, isServer }: GenerateWebpackOpts,
-  config: DevConfiguration
+  config: Configuration
 ) {
   let plugins = []
   if (!isServer) {
@@ -135,7 +134,7 @@ function getBundlePlugins(
   return plugins
 }
 
-function getOutputDirectoty(config: DevConfiguration, isDev:boolean, isServer: boolean) {
+function getOutputDirectoty(config: Configuration, isDev:boolean, isServer: boolean) {
   if (isDev || isServer) {
     return config.buildDirectory
   }
