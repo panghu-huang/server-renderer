@@ -1,21 +1,10 @@
 import* as React from 'react'
-import { RouteProps } from 'react-router-dom'
+import { RouteProps, RouteComponentProps } from 'react-router-dom'
 import { History } from 'history'
 
-declare global {
-  namespace React {
-    interface ComponentClass {
-      getInitialProps?: (...args: any[]) => object
-    }
-    interface FunctionComponent {
-      getInitialProps?: (...args: any[]) => object
-    }
-  }
+export * from 'react-router-dom'
 
-  interface Window {
-    __APP_DATA__: string
-  }
-}
+export type AppContainerType = React.ComponentType<AppContainerProps>
 
 export interface GlobalAppData {
   pageProps: object
@@ -33,9 +22,22 @@ export interface AppContainerProps {
 export interface RenderOptions {
   container: string
   routes: RouteProps[]
-  AppContainer?: React.ComponentType<AppContainerProps>
+  AppContainer?: AppContainerType
 }
 
 export function render(opts: RenderOptions): void
 
-export * from 'react-router-dom'
+declare global {
+  namespace React {
+    interface ComponentClass {
+      getInitialProps?: (...args: any[]) => object
+    }
+    interface FunctionComponent {
+      getInitialProps?: (...args: any[]) => object
+    }
+  }
+
+  interface Window {
+    __APP_DATA__: string
+  }
+}

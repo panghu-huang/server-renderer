@@ -9,14 +9,14 @@ import './server-compiler'
 const rootDirectory = process.cwd()
 const devConfig = getDevConfig()
 const clientDevConfig = genWebpackConfig({ 
-  rootDirectory, isDev: true, isServer: false 
+  rootDirectory, isDev: true, isServer: false,
 })
 const clientCompiler = webpack(clientDevConfig)
 
 const clientDevMiddleware = WebpackDevMiddleware(clientCompiler, {
   publicPath: clientDevConfig.output.publicPath,
   writeToDisk: false,
-  logLevel: 'warn',
+  logLevel: 'silent',
 })
 
 const app = http.createServer((req: http.IncomingMessage, res: http.ServerResponse) => {

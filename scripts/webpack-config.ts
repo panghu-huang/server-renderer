@@ -19,7 +19,8 @@ export function genWebpackConfig(opts: GenerateWebpackOpts) {
   if (!isServer) {
     plugins.push(
       new ForkTsCheckerWebpackPlugin({
-        tsconfig: path.join(rootDirectory, 'tsconfig.json')
+        tsconfig: path.join(rootDirectory, 'tsconfig.json'),
+        tslint: path.join(rootDirectory, 'tslint.json'),
       })
     )
   }
@@ -39,7 +40,6 @@ export function genWebpackConfig(opts: GenerateWebpackOpts) {
       libraryTarget: isServer ? 'commonjs2' : 'umd',
       pathinfo: false,
     },
-    cache: false,
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.d.ts'],
     },
@@ -50,7 +50,7 @@ export function genWebpackConfig(opts: GenerateWebpackOpts) {
           exclude: /node_modules/,
           loader: require.resolve('ts-loader'),
           options: {
-            transpileOnly: isServer,
+            transpileOnly: true,
           },
         },
         {
@@ -107,7 +107,7 @@ function getLocalIdent(
   options
 ) {
   const fileNameOrFolder = context.resourcePath.match(
-    /index\.m\.(css|scss|sass)$/
+    /index\.module\.(css|scss|sass)$/
   )
     ? '[folder]'
     : '[name]'
@@ -122,5 +122,5 @@ function getLocalIdent(
     fileNameOrFolder + '_' + localName + '__' + hash,
     options
   )
-  return className.replace('.m', '_')
+  return className.replace('.module', '_')
 }

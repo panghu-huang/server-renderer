@@ -7,7 +7,7 @@ export interface ContainerProps {
   routes: RouteProps[]
   matchedIndex: number
   pageProps: object
-  AppContainer: React.ComponentType<ServerRenderer.AppContainerProps>
+  AppContainer: ServerRenderer.AppContainerType
 }
 
 const emptyProps = {}

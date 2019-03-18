@@ -13,7 +13,7 @@ const serverCompiler = webpack(serverDevConfig)
 const serverDevMiddleware = WebpackDevMiddleware(serverCompiler, {
   publicPath: serverDevConfig.output.publicPath,
   writeToDisk: true,
-  logLevel: 'warn',
+  logLevel: 'silent',
 })
 
 let childProcess

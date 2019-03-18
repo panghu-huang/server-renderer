@@ -3,7 +3,7 @@ import * as http from 'http'
 import * as cheerio from 'cheerio'
 import { readFileSync } from 'fs'
 import { URL } from 'url'
-import { StaticRouter, RouteProps, matchPath } from 'react-router-dom'
+import { StaticRouter, matchPath, RouteProps } from 'react-router-dom'
 import { renderToString } from 'react-dom/server'
 import { getDevConfig } from 'scripts/dev-config'
 import Container from './Container'
@@ -19,7 +19,7 @@ class Server {
   private readonly clientChunkPath: URL
   private readonly container: string
   private readonly originalHTML: string
-  private readonly AppContainer: React.ComponentType<ServerRenderer.AppContainerProps>
+  private readonly AppContainer: ServerRenderer.AppContainerType
   private readonly routes: RouteProps[]
 
   constructor(opts: ServerRenderer.RenderOptions) {
@@ -91,7 +91,7 @@ class Server {
   }
 
   private async getInitialProps(
-    AppContainer: React.ComponentType<ServerRenderer.AppContainerProps>,
+    AppContainer: ServerRenderer.AppContainerType,
     pathname: string,
     matchedRoute: RouteProps
   ) {
