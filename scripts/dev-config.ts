@@ -13,6 +13,10 @@ export interface DevConfiguration {
   serverPublicPath: string
   clientChunkName: string
   serverChunkName: string
+  htmlTemplatePath: string
+  buildDirectory: string
+  staticDirectory: string
+  htmlFilename: string
   htmlPath: string
 }
 
@@ -26,6 +30,10 @@ export function getDevConfig(): DevConfiguration {
     devServerPort: DEFAULT_DEV_SERVER_PORT,
     clientPublicPath: DEFAULT_CLIENT_PUBLIC_PATH,
     serverPublicPath: DEFAULT_SERVER_PUBLIC_PATH,
-    htmlPath: join(rootDirectory, 'src/index.html'),
+    htmlTemplatePath: join(rootDirectory, 'src/index.html'),
+    htmlFilename: 'client.html',
+    htmlPath: join(rootDirectory, 'client.html'),
+    buildDirectory: 'build',
+    staticDirectory: 'static',
   }
 }

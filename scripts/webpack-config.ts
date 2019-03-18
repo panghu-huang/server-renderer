@@ -1,8 +1,12 @@
 import * as path from 'path'
+import * as MiniCssExtractPlugin from 'mini-css-extract-plugin'
+import * as HtmlWebpackPlugin from 'html-webpack-plugin'
 import * as ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin'
 import { Configuration } from 'webpack'
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
 import { getHashDigest, interpolateName } from 'loader-utils'
-import { getDevConfig } from './dev-config'
+import { getDevConfig, DevConfiguration } from './dev-config'
+import webpack = require('webpack');
 
 export interface GenerateWebpackOpts {
   rootDirectory: string
@@ -15,22 +19,16 @@ export function genWebpackConfig(opts: GenerateWebpackOpts) {
   const devConfig = getDevConfig()
   const resolve = absolutePath => path.resolve(rootDirectory, absolutePath)
 
-  const plugins = []
-  if (!isServer) {
-    plugins.push(
-      new ForkTsCheckerWebpackPlugin({
-        tsconfig: path.join(rootDirectory, 'tsconfig.json'),
-        tslint: path.join(rootDirectory, 'tslint.json'),
-      })
-    )
-  }
+  const outputDirectory = getOutputDirectoty(devConfig, isDev, isServer)
+  const plugins = getBundlePlugins(opts, devConfig)
+
   const config: Configuration = {
     stats: isDev ? 'errors-only' : 'normal',
     mode: isDev ? 'development' : 'production',
     target: isServer ? 'node' : 'web',
-    entry: resolve(`src/index.tsx`),
+    entry: resolve('src/index.tsx'),
     output: {
-      path: resolve('build'),
+      path: resolve(outputDirectory),
       publicPath: isServer 
       ? devConfig.serverPublicPath 
       : devConfig.clientPublicPath,
@@ -42,6 +40,11 @@ export function genWebpackConfig(opts: GenerateWebpackOpts) {
     },
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.d.ts'],
+      alias: {
+        'server-renderer': isServer 
+          ? 'server-renderer/lib/server.js' 
+          : 'server-renderer/lib/client.js'
+      },
     },
     module: {
       rules: [
@@ -56,11 +59,33 @@ export function genWebpackConfig(opts: GenerateWebpackOpts) {
         {
           test: /\.scss$/,
           exclude: /node_modules/,
-          use: getSassLoaders(isServer),
+          use: getSassLoaders(isServer, isDev),
         }
       ],
     },
     plugins,
+    optimization: (isDev || isServer)
+      ? undefined
+      : {
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            default: false,
+            vendors: false,
+            commons: {
+              name: 'commons',
+              chunks: 'all',
+              minChunks: 2,
+            },
+            react: {
+              name: 'commons',
+              chunks: 'all',
+              test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/
+            }
+          }
+        },
+        minimize: !isDev && !isServer,
+      },
   }
   
   if (!isServer) {
@@ -76,7 +101,48 @@ export function genWebpackConfig(opts: GenerateWebpackOpts) {
   return config
 }
 
-function getSassLoaders(isServer: boolean) {
+function getBundlePlugins(
+  { rootDirectory, isDev, isServer }: GenerateWebpackOpts,
+  config: DevConfiguration
+) {
+  let plugins = []
+  if (!isServer) {
+    // 客户端
+    plugins.push(
+      new ForkTsCheckerWebpackPlugin({
+        tsconfig: path.join(rootDirectory, 'tsconfig.json'),
+        tslint: path.join(rootDirectory, 'tslint.json'),
+      })
+    )
+    if (!isDev) {
+      plugins = plugins.concat(
+        [
+          new MiniCssExtractPlugin({
+            filename: '[name].css',
+            chunkFilename: '[id].css',
+          }),
+          new BundleAnalyzerPlugin(),
+          new webpack.optimize.ModuleConcatenationPlugin(),
+          new webpack.optimize.AggressiveMergingPlugin(),
+          new HtmlWebpackPlugin({
+            template: config.htmlTemplatePath,
+            filename: config.htmlFilename,
+          })
+        ]
+      )
+    }
+  }
+  return plugins
+}
+
+function getOutputDirectoty(config: DevConfiguration, isDev:boolean, isServer: boolean) {
+  if (isDev || isServer) {
+    return config.buildDirectory
+  }
+  return config.staticDirectory
+}
+
+function getSassLoaders(isServer: boolean, isDev: boolean) {
   const cssLoader = {
     loader: require.resolve('css-loader'),
     options: {
@@ -92,10 +158,17 @@ function getSassLoaders(isServer: boolean) {
       require.resolve('sass-loader'),
     ]
   } else {
+    if (isDev) {
+      return [
+        require.resolve('style-loader'),
+        cssLoader,
+        require.resolve('sass-loader'),
+      ]
+    }
     return [
-      require.resolve('style-loader'),
+      MiniCssExtractPlugin.loader,
       cssLoader,
-      require.resolve('sass-loader'),
+      require.resolve('sass-loader')
     ]
   }
 }
