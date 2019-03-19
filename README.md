@@ -1,5 +1,5 @@
 # ServerRenderer
-library for of server side render for React
+library of server side render for React
 
 ## 安装
 ```bash
