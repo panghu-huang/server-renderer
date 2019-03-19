@@ -1,8 +1,9 @@
-import* as React from 'react'
+import * as React from 'react'
 import { RouteProps, RouteComponentProps } from 'react-router-dom'
 import { History } from 'history'
 
 export * from 'react-router-dom'
+export * from 'history'
 
 export type AppContainerType = React.ComponentType<AppContainerProps>
 
@@ -22,6 +23,7 @@ export interface AppContainerProps {
 export interface RenderOptions {
   container: string
   routes: RouteProps[]
+  history?: History
   AppContainer?: AppContainerType
 }
 

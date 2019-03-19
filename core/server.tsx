@@ -18,7 +18,7 @@ const isDev = process.env.NODE_ENV === 'development'
 
 class Server {
 
-  private readonly port = 3030
+  private readonly port = config.serverPort
   private readonly clientChunkPath: URL
   private readonly container: string
   private readonly originalHTML: string
@@ -41,20 +41,7 @@ class Server {
     const app = new Koa()
     const router = new Router()
     if (!isDev) {
-      const staticDirName = config.staticDirName
-      const staticDirectory = config.staticDirectory
-      app.use(async (ctx, next) => {
-        const path = ctx.path
-        if(path.startsWith(`/${staticDirName}/`)) {
-          await send(
-            ctx, 
-            path.replace(`/${staticDirName}/`, ''), 
-            { root: staticDirectory }
-          )
-        } else {
-          await next()
-        }
-      })
+      app.use(this.serveFiles)
     }
     router.get('*', this.handleRequest.bind(this))
     app.use(router.routes())
@@ -88,6 +75,21 @@ class Server {
       ctx.body = this.renderHTML(content, pageProps)
     } else {
       ctx.body = 'Page not found'
+    }
+  }
+
+  private async serveFiles(ctx: Koa.ParameterizedContext, next: () => Promise<void>) {
+    const staticDirName = config.staticDirName
+    const staticDirectory = config.staticDirectory
+    const path = ctx.path
+    if (path.startsWith(`/${staticDirName}/`)) {
+      await send(
+        ctx,
+        path.replace(`/${staticDirName}/`, ''),
+        { root: staticDirectory }
+      )
+    } else {
+      await next()
     }
   }
 
@@ -127,3 +129,4 @@ export function render(opts: ServerRenderer.RenderOptions) {
 }
 
 export * from 'react-router-dom'
+export * from 'history'

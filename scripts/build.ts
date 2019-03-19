@@ -1,37 +1,30 @@
 import * as webpack from 'webpack'
-import { existsSync, rmdirSync } from 'fs'
+import * as fs from 'fs'
 import { join } from 'path'
 import { genWebpackConfig } from './webpack-config'
 import { getConfig } from './config'
 import chalk from 'chalk'
 
-const rootDirectory = process.cwd()
-const config = getConfig()
-const clientConfig = genWebpackConfig({ isDev: false, isServer: false, rootDirectory, })
-const serverConfig = genWebpackConfig({ isDev: false, isServer: true, rootDirectory, })
+runCompiler()
 
-async function compile() {
-  // const buildDirectory = join(rootDirectory, devConfig.buildDirectory)
-  // const staticDirecory = join(rootDirectory, devConfig.staticDirectory)
-  // if (existsSync(buildDirectory)) {
-  //   rmdirSync(buildDirectory)
-  // }
-  // if (existsSync(staticDirecory)) {
-  //   rmdirSync(staticDirecory)
-  // }
+async function runCompiler() {
+  const rootDirectory = process.cwd()
+  const config = getConfig()
+  const clientConfig = genWebpackConfig({ isDev: false, isServer: false, rootDirectory, })
+  const serverConfig = genWebpackConfig({ isDev: false, isServer: true, rootDirectory, })
+  rmdir(config.buildDirectory)
+  rmdir(config.staticDirectory)
   console.log(
     chalk.green('打包服务端资源文件...')
   )
-  await runCompile(serverConfig)
+  await compiler(serverConfig)
   console.log(
     chalk.green('打包客户端资源文件...')
   )
-  await runCompile(clientConfig)
+  await compiler(clientConfig)
 }
 
-compile()
-
-function runCompile(config: webpack.Configuration) {
+function compiler(config: webpack.Configuration) {
   return new Promise((resolve, reject) => {
     webpack(config).run((err, stats) => {
       if (err) reject(err)
@@ -53,4 +46,22 @@ function runCompile(config: webpack.Configuration) {
       resolve()
     })
   })
+}
+
+function rmdir(directory: string) {
+  if (fs.existsSync(directory)) {
+    const files = fs.readdirSync(directory)
+    if (files.length) {
+      files.forEach(file => {
+        const filePath = join(directory, file)
+        const stats = fs.statSync(filePath)
+        if (stats.isDirectory()) {
+          rmdir(filePath)
+        } else {
+          fs.unlinkSync(filePath)
+        }
+      })
+    }
+    fs.rmdirSync(directory)
+  }
 }

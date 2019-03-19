@@ -10,7 +10,7 @@ export function render(opts: ServerRenderer.RenderOptions) {
   const AppContainer = opts.AppContainer || React.Fragment
   const routes = opts.routes
   const pathname = window.location.pathname
-  const history = createBrowserHistory()
+  const history = opts.history || createBrowserHistory()
   const matchedIndex = routes.findIndex(route => {
     return !!matchPath(pathname, route)
   })
@@ -30,3 +30,4 @@ export function render(opts: ServerRenderer.RenderOptions) {
 }
 
 export * from 'react-router-dom'
+export * from 'history'
