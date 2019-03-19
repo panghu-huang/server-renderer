@@ -18,4 +18,5 @@ if (existsSync(serverChunkPath)) {
   console.log(
     chalk.red(`未找到 ${serverChunk}，请先执行 'yarn build'`)
   )
+  process.exit(1)
 }
