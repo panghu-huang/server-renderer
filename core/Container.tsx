@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { StaticRouterContext } from 'react-router'
 import { Route, Switch, RouteProps } from 'react-router-dom'
 
 import ServerRenderer = require('index')

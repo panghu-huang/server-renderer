@@ -20,6 +20,7 @@ export interface Configuration {
   staticDirectory: string
   htmlFilename: string
   htmlPath: string
+  srcDirectory: string
 }
 
 const rootDirectory = process.cwd()
@@ -42,5 +43,6 @@ export function getConfig(): Configuration {
     staticDirName,
     buildDirectory: join(rootDirectory, buildDirName),
     staticDirectory: join(rootDirectory, staticDirName),
+    srcDirectory: join(rootDirectory, 'src'),
   }
 }

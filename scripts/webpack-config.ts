@@ -42,7 +42,8 @@ export function genWebpackConfig(opts: GenerateWebpackOpts) {
       alias: {
         'server-renderer': isServer 
           ? 'server-renderer/lib/server.js' 
-          : 'server-renderer/lib/client.js'
+          : 'server-renderer/lib/client.js',
+        src: config.srcDirectory,
       },
     },
     module: {
