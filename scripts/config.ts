@@ -21,6 +21,7 @@ export interface Configuration {
   htmlFilename: string
   htmlPath: string
   srcDirectory: string
+  customConfigFile: string
 }
 
 const rootDirectory = process.cwd()
@@ -30,6 +31,9 @@ export function getConfig(): Configuration {
   const staticDirName = 'static'
   const buildDirName = 'build'
   return {
+    htmlFilename,
+    buildDirName,
+    staticDirName,
     clientChunkName: 'app.js',
     serverChunkName: 'server.js',
     webpackServerPort: DEFAULT_WEBPACK_SERVER_PORT,
@@ -37,12 +41,10 @@ export function getConfig(): Configuration {
     clientPublicPath: DEFAULT_CLIENT_PUBLIC_PATH,
     serverPublicPath: DEFAULT_SERVER_PUBLIC_PATH,
     htmlTemplatePath: join(rootDirectory, 'src/index.html'),
-    htmlFilename,
     htmlPath: join(rootDirectory, staticDirName, 'client.html'),
-    buildDirName,
-    staticDirName,
     buildDirectory: join(rootDirectory, buildDirName),
     staticDirectory: join(rootDirectory, staticDirName),
     srcDirectory: join(rootDirectory, 'src'),
+    customConfigFile: join(rootDirectory, 'server-renderer.config.js'),
   }
 }

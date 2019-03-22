@@ -1,9 +1,32 @@
 import * as React from 'react'
-import { RouteProps, RouteComponentProps } from 'react-router-dom'
-import { History } from 'history'
+import { Location } from 'history'
 
-export * from 'react-router-dom'
-export * from 'history'
+export interface RouterStore {
+  location: Location
+}
+
+export interface RouterProps {
+  location: string
+  routes: Route[]
+  AppContainer: AppContainerType
+  pageProps: object
+}
+
+export type RouteComponent = React.ComponentType<RouteComponentProps> | React.FunctionComponent<RouteComponentProps> | React.SFC<RouteComponentProps>
+
+export interface Route {
+  name: string
+  path: string
+  component: RouteComponent
+}
+
+export interface FetchData<T = {}> {
+  loading?: boolean
+  data?: T | null
+  error?: Error | string | null
+}
+
+export type RouteComponentProps = FetchData & { [propName: string]: any }
 
 export type AppContainerType = React.ComponentType<AppContainerProps>
 
@@ -13,7 +36,7 @@ export interface GlobalAppData {
 
 export interface GetInitialPropsParams {
   pathname: string
-  route: RouteProps
+  route: Route
 }
 
 export interface AppContainerProps {
@@ -22,20 +45,28 @@ export interface AppContainerProps {
 
 export interface RenderOptions {
   container: string
-  routes: RouteProps[]
-  history?: History
+  routes: Route[]
   AppContainer?: AppContainerType
 }
+
+export class Router extends React.Component<RouterProps> {
+  public static push(path: string, state?: any): void
+  public static replace(path: string, state?: any): void
+  public static go(n: number): void
+  public static goBack(): void
+}
+
+export const RouterContext: React.Context<RouterStore>
 
 export function render(opts: RenderOptions): void
 
 declare global {
   namespace React {
     interface ComponentClass {
-      getInitialProps?: (...args: any[]) => object
+      getInitialProps?: (pathname: string) => object
     }
     interface FunctionComponent {
-      getInitialProps?: (...args: any[]) => object
+      getInitialProps?: (pathname: string) => object
     }
   }
 
