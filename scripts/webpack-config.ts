@@ -3,9 +3,11 @@ import * as webpack from 'webpack'
 import * as MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import * as HtmlWebpackPlugin from 'html-webpack-plugin'
 import * as ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin'
-import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
+import * as mergeWebpackConfig from 'webpack-merge'
+import { existsSync, readFileSync } from 'fs'
+import { join } from 'path'
 import { getHashDigest, interpolateName } from 'loader-utils'
-import { getConfig, Configuration } from './config'
+import { getConfig, Configuration, CustomConfiguration } from './config'
 
 export interface GenerateWebpackOpts {
   rootDirectory: string
@@ -98,6 +100,21 @@ export function genWebpackConfig(opts: GenerateWebpackOpts) {
     }
   }
 
+  return mergeConfig(webpackConfig, config, opts)
+}
+
+function mergeConfig(
+  webpackConfig: webpack.Configuration, 
+  config: Configuration,
+  opts: GenerateWebpackOpts
+) {
+  if (existsSync(config.customConfigFile)) {
+    const customConfig = require(config.customConfigFile) as CustomConfiguration
+    if ('function' === typeof customConfig.webpack) {
+      return customConfig.webpack(webpackConfig, opts)
+    }
+    return mergeWebpackConfig(webpackConfig, customConfig.webpack)
+  }
   return webpackConfig
 }
 
@@ -131,6 +148,15 @@ function getBundlePlugins(
         ]
       )
     }
+  }
+  const envConfig = getEnvConfig(
+    rootDirectory,
+    config.envFiles.concat(`.env.${isServer ? 'server' : 'client'}`)
+  )
+  if (Object.keys(envConfig).length) {
+    plugins.push(
+      new webpack.DefinePlugin(envConfig)
+    )
   }
   return plugins
 }
@@ -171,6 +197,22 @@ function getSassLoaders(isServer: boolean, isDev: boolean) {
       require.resolve('sass-loader')
     ]
   }
+}
+
+function getEnvConfig(rootDirectory: string, envFiles: string[]): { [n: string]: string } {
+  const config = envFiles.reduce((config, filename) => {
+    if (existsSync(filename)) {
+      const content = readFileSync(join(rootDirectory, filename), 'utf-8')
+      content.split('\n').forEach(line => {
+        const [key, value] = line.split('=')
+        if (key && value && key.startsWith('APP_')) {
+          config[`process.env.${key.trim()}`] = JSON.stringify(value.trim())
+        }
+      })
+    }
+    return config
+  }, {})
+  return config
 }
 
 function getLocalIdent(

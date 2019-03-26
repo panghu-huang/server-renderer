@@ -1,4 +1,6 @@
+import * as webpack from 'webpack'
 import { join } from 'path'
+import { GenerateWebpackOpts } from './webpack-config'
 
 const DEFAULT_WEBPACK_SERVER_PORT = 8080
 const DEFAULT_DEV_SERVER_PORT = 3030
@@ -22,6 +24,16 @@ export interface Configuration {
   htmlPath: string
   srcDirectory: string
   customConfigFile: string
+  envFiles: string[]
+}
+
+type CustomMerge = (
+  config: webpack.Configuration, 
+  opts: GenerateWebpackOpts
+) => webpack.Configuration
+
+export interface CustomConfiguration {
+  webpack?: webpack.Configuration | CustomMerge
 }
 
 const rootDirectory = process.cwd()
@@ -46,5 +58,9 @@ export function getConfig(): Configuration {
     staticDirectory: join(rootDirectory, staticDirName),
     srcDirectory: join(rootDirectory, 'src'),
     customConfigFile: join(rootDirectory, 'server-renderer.config.js'),
+    envFiles: [
+      '.env', 
+      `.env.${process.env.NODE_ENV}`
+    ],
   }
 }
