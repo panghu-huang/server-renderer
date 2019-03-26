@@ -12,6 +12,15 @@ export interface RouterProps {
   pageProps: object
 }
 
+export interface LinkProps {
+  to: string
+  style?: React.CSSProperties
+  className?: string
+  activeClassName?: string
+  onClick?: React.MouseEventHandler
+  children?: React.ReactNode
+}
+
 export type RouteComponent = React.ComponentType<RouteComponentProps> | React.FunctionComponent<RouteComponentProps> | React.SFC<RouteComponentProps>
 
 export interface Route {
@@ -48,6 +57,8 @@ export interface RenderOptions {
   routes: Route[]
   AppContainer?: AppContainerType
 }
+
+export const Link: React.FunctionComponent<LinkProps>
 
 export class Router extends React.Component<RouterProps> {
   public static push(path: string, state?: any): void

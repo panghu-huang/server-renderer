@@ -2,6 +2,7 @@ import * as React from 'react'
 import { hydrate } from 'react-dom'
 import { RenderOptions, GlobalAppData } from 'index.d'
 import Router from './Router'
+import Link from './Link'
 
 export function render(opts: RenderOptions) {
   const AppContainer = opts.AppContainer || React.Fragment
@@ -20,7 +21,5 @@ export function render(opts: RenderOptions) {
   hydrate(app, document.querySelector(opts.container))
 }
 
-export {
-  Router
-}
+export { Router, Link }
 export * from 'history'

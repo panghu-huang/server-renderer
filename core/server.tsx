@@ -7,6 +7,7 @@ import { URL } from 'url'
 import { renderToString } from 'react-dom/server'
 import { getConfig } from 'scripts/config'
 import Router from './Router'
+import Link from './Link'
 // @ts-ignore
 import send from 'koa-send'
 // @ts-ignore
@@ -124,6 +125,4 @@ export function render(opts: ServerRenderer.RenderOptions) {
 }
 
 export * from 'history'
-export {
-  Router
-}
+export { Router, Link }
