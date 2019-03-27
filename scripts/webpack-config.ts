@@ -60,7 +60,7 @@ export function genWebpackConfig(opts: GenerateWebpackOpts) {
         },
         {
           test: /\.scss$/,
-          exclude: /node_modules/,
+          // exclude: /node_modules/,
           use: getSassLoaders(isServer, isDev),
         }
       ],

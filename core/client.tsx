@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { hydrate } from 'react-dom'
+import { RouterContext } from './RouterContext'
 import { RenderOptions, GlobalAppData } from 'index.d'
 import Router from './Router'
 import Link from './Link'
@@ -21,5 +22,5 @@ export function render(opts: RenderOptions) {
   hydrate(app, document.querySelector(opts.container))
 }
 
-export { Router, Link }
+export { Router, Link, RouterContext }
 export * from 'history'

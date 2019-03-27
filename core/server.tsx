@@ -4,6 +4,7 @@ import * as KoaRouter from 'koa-router'
 import * as cheerio from 'cheerio'
 import { readFileSync } from 'fs'
 import { URL } from 'url'
+import { RouterContext } from './RouterContext'
 import { renderToString } from 'react-dom/server'
 import { getConfig } from 'scripts/config'
 import Router from './Router'
@@ -125,4 +126,4 @@ export function render(opts: ServerRenderer.RenderOptions) {
 }
 
 export * from 'history'
-export { Router, Link }
+export { Router, Link, RouterContext }

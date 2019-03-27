@@ -109,7 +109,7 @@ class Router extends React.Component<RouterProps, RouteState> {
   }
 
   private fetchInitialProps = async (comp: RouteComponent | null, pathname: string) => {
-    if (comp.getInitialProps) {
+    if (comp && comp.getInitialProps) {
       this.setState({ loading: true })
       try {
         const initialProps = await comp.getInitialProps(pathname)
