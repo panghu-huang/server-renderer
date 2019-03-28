@@ -24,6 +24,7 @@ export function genWebpackConfig(opts: GenerateWebpackOpts) {
   const plugins = getBundlePlugins(opts, config)
 
   const webpackConfig: webpack.Configuration = {
+    devtool: (isDev && !isServer) ? 'source-map' : false,
     stats: isDev ? 'errors-only' : 'normal',
     mode: isDev ? 'development' : 'production',
     target: isServer ? 'node' : 'web',

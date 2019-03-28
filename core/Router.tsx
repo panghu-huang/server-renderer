@@ -33,7 +33,7 @@ class Router extends React.Component<RouterProps, RouteState> {
 
   constructor(props: RouterProps) {
     super(props)
-    const { routes, location, pageProps } = props
+    const { routes, location, pageProps, error } = props
     const matchedRoute = this.getMatchedRoute(routes, location)
     this.state = {
       routerStore: {
@@ -46,7 +46,7 @@ class Router extends React.Component<RouterProps, RouteState> {
       },
       loading: false,
       data: pageProps,
-      error: null,
+      error,
       component: matchedRoute
         ? matchedRoute.component
         : null

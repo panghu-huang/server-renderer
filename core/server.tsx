@@ -49,6 +49,7 @@ class Server {
     router.get('*', this.handleRequest.bind(this))
     app.use(router.routes())
     app.listen(this.port, () => {
+      console.clear()
       console.log('Server listen on: http://localhost:' + this.port)
     })
   }
@@ -59,21 +60,30 @@ class Server {
     const matchedRoute = routes.find(route => {
       return path2Regexp(pathname).test(route.path)
     })
-    if (matchedRoute) {
-      const AppContainer = this.AppContainer
-      const pageProps = await this.getInitialProps(pathname, matchedRoute)
+    const AppContainer = this.AppContainer
+    if (!matchedRoute) {
       const content = renderToString(
-        <Router 
-          location={pathname} 
+        <Router
+          location={pathname}
+          AppContainer={AppContainer}
+          pageProps={{}}
+          error='Page not found'
+          routes={routes}
+        />
+      )
+      return ctx.body = this.renderHTML(content, {})
+    }
+    const { pageProps, error } = await this.getInitialProps(pathname, matchedRoute)
+      const content = renderToString(
+        <Router
+          location={pathname}
           AppContainer={AppContainer}
           pageProps={pageProps}
+          error={error}
           routes={routes}
         />
       )
       ctx.body = this.renderHTML(content, pageProps)
-    } else {
-      ctx.body = 'Page not found'
-    }
   }
 
   private async serveFiles(ctx: Koa.ParameterizedContext, next: () => Promise<void>) {
@@ -107,15 +117,20 @@ class Server {
     return $.html()
   }
 
-  private async getInitialProps(
-    pathname: string,
-    matchedRoute: ServerRenderer.Route
-  ) {
+  private async getInitialProps(pathname: string, matchedRoute: ServerRenderer.Route): Promise<{ pageProps: object, error: any }> {
     const { component } = matchedRoute
     if (component.getInitialProps) {
-      return await component.getInitialProps(pathname)
+      try {
+        const pageProps =  await component.getInitialProps(pathname)
+        return { pageProps, error: null }
+      } catch (error) {
+        return { pageProps: {}, error }
+      }
     }
-    return {}
+    return {
+      pageProps: {},
+      error: null,
+    }
   }
 
 }

@@ -26,6 +26,7 @@ const app = http.createServer((req: http.IncomingMessage, res: http.ServerRespon
 })
 
 app.listen(config.webpackServerPort, () => {
+  console.clear()
   console.log(
     chalk.green(`正在启动开发服务...`)
   )

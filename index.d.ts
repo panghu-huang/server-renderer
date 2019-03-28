@@ -10,6 +10,7 @@ export interface RouterProps {
   routes: Route[]
   AppContainer: AppContainerType
   pageProps: object
+  error?: any
 }
 
 export interface LinkProps {
