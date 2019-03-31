@@ -75,10 +75,10 @@ export function render(opts: RenderOptions): void
 declare global {
   namespace React {
     interface ComponentClass {
-      getInitialProps?: (pathname: string) => object
+      getInitialProps?: (pathname: string) => any
     }
     interface FunctionComponent {
-      getInitialProps?: (pathname: string) => object
+      getInitialProps?: (pathname: string) => any
     }
   }
 

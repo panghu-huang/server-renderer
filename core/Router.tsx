@@ -135,7 +135,7 @@ class Router extends React.Component<RouterProps, RouteState> {
 
   private getMatchedRoute(routes: Route[], pathname: string): Route | null {
     return routes.find(route => {
-      return path2Regexp(pathname).test(route.path)
+      return path2Regexp(route.path, [], { strict: true }).test(pathname)
     })
   }
 

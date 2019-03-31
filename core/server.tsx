@@ -58,7 +58,7 @@ class Server {
     const routes = this.routes
     const pathname = ctx.url
     const matchedRoute = routes.find(route => {
-      return path2Regexp(pathname).test(route.path)
+      return path2Regexp(route.path, [], { strict: true }).test(pathname)
     })
     const AppContainer = this.AppContainer
     if (!matchedRoute) {
@@ -106,7 +106,7 @@ class Server {
     $(this.container).html(content)
     $('head').append(`
       <script type='text/javascript'>
-          __APP_DATA__='${encodeURIComponent(JSON.stringify({ pageProps }))}'
+          __APP_DATA__="${encodeURIComponent(JSON.stringify({ pageProps }))}"
       </script>
     `)
     if (isDev) {
