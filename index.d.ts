@@ -5,12 +5,15 @@ export interface RouterStore {
   location: Location
 }
 
+export interface ErrorProps {
+  error: any
+}
+
 export interface RouterProps {
   location: string
   routes: Route[]
   AppContainer: AppContainerType
   pageProps: object
-  error?: any
 }
 
 export interface LinkProps {
@@ -22,7 +25,7 @@ export interface LinkProps {
   children?: React.ReactNode
 }
 
-export type RouteComponent = React.ComponentType<RouteComponentProps> | React.FunctionComponent<RouteComponentProps> | React.SFC<RouteComponentProps>
+export type RouteComponent = React.ComponentType<any>
 
 export interface Route {
   name: string
@@ -30,33 +33,28 @@ export interface Route {
   component: RouteComponent
 }
 
-export interface FetchData<T = {}> {
-  loading?: boolean
-  data?: T | null
-  error?: Error | string | null
-}
-
-export type RouteComponentProps = FetchData & { [propName: string]: any }
-
 export type AppContainerType = React.ComponentType<AppContainerProps>
 
 export interface GlobalAppData {
   pageProps: object
+  error: any
 }
 
-export interface GetInitialPropsParams {
-  pathname: string
-  route: Route
-}
-
-export interface AppContainerProps {
-  children: React.ReactNode
+export type AppContainerProps<T = {}> = T &{
+  loading: boolean
+  Component: React.ComponentType<any>
 }
 
 export interface RenderOptions {
   container: string
   routes: Route[]
+  Error?: React.ComponentType<ErrorProps>
   AppContainer?: AppContainerType
+}
+
+export interface Params {
+  Component: React.ComponentType<any>
+  url: string
 }
 
 export const Link: React.FunctionComponent<LinkProps>
@@ -75,10 +73,10 @@ export function render(opts: RenderOptions): void
 declare global {
   namespace React {
     interface ComponentClass {
-      getInitialProps?: (pathname: string) => any
+      getInitialProps?: (...args: any[]) => any
     }
     interface FunctionComponent {
-      getInitialProps?: (pathname: string) => any
+      getInitialProps?: (...args: any[]) => any
     }
   }
 

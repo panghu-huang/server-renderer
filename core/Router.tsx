@@ -12,10 +12,9 @@ import path2Regexp from 'path-to-regexp'
 
 interface RouteState {
   routerStore: RouterStore
-  loading: boolean
-  data: any
-  error: null | string | Error
   component: RouteComponent | null
+  pageProps: object
+  loading: boolean
 }
 
 const history = 'undefined' === typeof window
@@ -33,7 +32,7 @@ class Router extends React.Component<RouterProps, RouteState> {
 
   constructor(props: RouterProps) {
     super(props)
-    const { routes, location, pageProps, error } = props
+    const { routes, location, pageProps } = props
     const matchedRoute = this.getMatchedRoute(routes, location)
     this.state = {
       routerStore: {
@@ -44,12 +43,11 @@ class Router extends React.Component<RouterProps, RouteState> {
           hash: '',
         },
       },
-      loading: false,
-      data: pageProps,
-      error,
       component: matchedRoute
         ? matchedRoute.component
-        : null
+        : null,
+      pageProps,
+      loading: false,
     }
   }
 
@@ -64,24 +62,25 @@ class Router extends React.Component<RouterProps, RouteState> {
             ...routerStore, location,
           },
           component,
-          data: null,
-          error: null,
           loading: false,
+          pageProps: undefined,
         }
       }, () => {
-        this.fetchInitialProps(component, location.pathname)
+        this.fetchInitialProps(matched, location.pathname)
       })
     })
   }
 
   public render() {
     const { AppContainer } = this.props
-    const { routerStore, component, data, loading, error } = this.state
+    const { routerStore, component, pageProps, loading } = this.state
     return (
       <RouterContext.Provider value={routerStore}>
-        <AppContainer>
-          {this.renderContent(component, data, loading, error)}
-        </AppContainer>
+        <AppContainer 
+          loading={loading}
+          Component={component}
+          {...pageProps}
+        />
       </RouterContext.Provider>
     )
   }
@@ -90,46 +89,18 @@ class Router extends React.Component<RouterProps, RouteState> {
     this.unlisten()
   }
 
-  private renderContent(
-    Component: RouteComponent | null,
-    data: any,
-    loading: boolean,
-    error: Error | null | string
-  ) {
-    if (Component) {
-      return (
-        <Component
-          data={data}
-          loading={loading}
-          error={error}
-        />
-      )
-    }
-    return null
-  }
-
-  private fetchInitialProps = async (comp: RouteComponent | null, pathname: string) => {
-    if (comp && comp.getInitialProps) {
+  private fetchInitialProps = async (matchedRoute: Route, url: string) => {
+    const { AppContainer } = this.props
+    if (AppContainer && AppContainer.getInitialProps) {
       this.setState({ loading: true })
-      try {
-        const initialProps = await comp.getInitialProps(pathname)
-        this.setState(({ component }) => {
-          if (comp !== component) {
-            return null
-          }
-          return {
-            data: initialProps,
-            loading: false,
-          }
-        })
-      } catch (error) {
-        this.setState(({ component }) => {
-          if (comp !== component) {
-            return null
-          }
-          return { loading: false, error }
-        })
-      }
+      const initialProps = await AppContainer.getInitialProps({
+        url,
+        Component: matchedRoute.component,
+      })
+      this.setState({
+        pageProps: initialProps,
+        loading: false,
+      })
     }
   }
 

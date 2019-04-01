@@ -6,7 +6,6 @@ import * as ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin'
 import * as mergeWebpackConfig from 'webpack-merge'
 import { existsSync, readFileSync } from 'fs'
 import { join } from 'path'
-import { getHashDigest, interpolateName } from 'loader-utils'
 import { getConfig, Configuration, CustomConfiguration } from './config'
 
 export interface GenerateWebpackOpts {
@@ -61,7 +60,7 @@ export function genWebpackConfig(opts: GenerateWebpackOpts) {
         },
         {
           test: /\.scss$/,
-          // exclude: /node_modules/,
+          exclude: /node_modules/,
           use: getSassLoaders(isServer, isDev),
         }
       ],
@@ -139,7 +138,6 @@ function getBundlePlugins(
             filename: '[name].css',
             chunkFilename: '[id].css',
           }),
-          // new BundleAnalyzerPlugin(),
           new webpack.optimize.ModuleConcatenationPlugin(),
           new webpack.optimize.AggressiveMergingPlugin(),
           new HtmlWebpackPlugin({
@@ -175,7 +173,7 @@ function getSassLoaders(isServer: boolean, isDev: boolean) {
     options: {
       importLoaders: 1,
       modules: true,
-      getLocalIdent,
+      localIdentName: '[name]_[local]--[hash:base64:4]',
     },
   }
   if (isServer) {
@@ -214,29 +212,4 @@ function getEnvConfig(rootDirectory: string, envFiles: string[]): { [n: string]:
     return config
   }, {})
   return config
-}
-
-function getLocalIdent(
-  context,
-  localIdentName,
-  localName,
-  options
-) {
-  const fileNameOrFolder = context.resourcePath.match(
-    /index\.module\.(css|scss|sass)$/
-  )
-    ? '[folder]'
-    : '[name]'
-  const hash = getHashDigest(
-    context.resourcePath + localName,
-    'md5',
-    'base64',
-    5
-  )
-  const className = interpolateName(
-    context,
-    fileNameOrFolder + '_' + localName + '__' + hash,
-    options
-  )
-  return className.replace('.module', '_')
 }
