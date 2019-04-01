@@ -7,13 +7,11 @@ import { URL } from 'url'
 import { RouterContext } from './RouterContext'
 import { renderToString } from 'react-dom/server'
 import { getConfig } from 'scripts/config'
+import path2Regexp from 'path-to-regexp'
+import send from 'koa-send'
 import Router from './Router'
 import Link from './Link'
 import Error from './Error'
-// @ts-ignore
-import send from 'koa-send'
-// @ts-ignore
-import path2Regexp from 'path-to-regexp'
 
 import ServerRenderer = require('index.d')
 
@@ -52,7 +50,6 @@ class Server {
     router.get('*', this.handleRequest.bind(this))
     app.use(router.routes())
     app.listen(this.port, () => {
-      console.clear()
       console.log('Server listen on: http://localhost:' + this.port)
     })
   }
@@ -60,6 +57,7 @@ class Server {
   private async handleRequest(ctx: Koa.ParameterizedContext) {
     const routes = this.routes
     const url = ctx.url
+    const fullUrl = ctx.origin + url
     const matchedRoute = routes.find(route => {
       return path2Regexp(route.path, [], { strict: true }).test(url)
     })
@@ -67,28 +65,30 @@ class Server {
     const Error = this.Error
     if (!matchedRoute) {
       const content = renderToString(
-        <Error error='Page not found' />
+        <Router
+          location={fullUrl}
+          AppContainer={AppContainer}
+          pageProps={{}}
+          routes={routes}
+          error={(
+            <Error error='Page not found' />
+          )}
+        />
       )
       return ctx.body = this.renderHTML(content, {}, 'Page not found')
     }
     const { pageProps, error } = await this.getInitialProps(
-      AppContainer, matchedRoute, url
+      AppContainer, matchedRoute, url,
     )
-    let app
-    if (error) {
-      app = renderToString(
-        <Error error={error} />
-      )
-    } else {
-      app = renderToString(
-        <Router
-          location={url}
-          AppContainer={AppContainer}
-          pageProps={pageProps}
-          routes={routes}
-        />
-      )
-    }
+    const app = renderToString(
+      <Router
+        location={fullUrl}
+        AppContainer={AppContainer}
+        pageProps={pageProps}
+        routes={routes}
+        error={error ? <Error error={error} /> : undefined}
+      />
+    )
     ctx.body = this.renderHTML(app, pageProps, error)
   }
 
@@ -113,8 +113,8 @@ class Server {
     $('head').append(`
       <script type='text/javascript'>
           __APP_DATA__="${encodeURIComponent(
-            JSON.stringify({ pageProps, error }))
-          }"
+      JSON.stringify({ pageProps, error }))
+      }"
       </script>
     `)
     if (isDev) {
@@ -126,12 +126,12 @@ class Server {
   }
 
   private async getInitialProps(
-    AppContainer: ServerRenderer.AppContainerType, 
+    AppContainer: ServerRenderer.AppContainerType,
     matchedRoute: ServerRenderer.Route,
     url: string): Promise<{ pageProps: object, error: any }> {
     if (AppContainer.getInitialProps) {
       try {
-        const pageProps =  await AppContainer.getInitialProps({
+        const pageProps = await AppContainer.getInitialProps({
           Component: matchedRoute.component,
           url,
         })

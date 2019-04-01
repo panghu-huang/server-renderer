@@ -1,9 +1,8 @@
 import * as React from 'react'
 import { RouterContext } from './RouterContext'
 import { LinkProps } from 'index.d'
-import Router from './Router'
-// @ts-ignore
 import path2Regexp from 'path-to-regexp'
+import Router from './Router'
 
 const Link: React.FunctionComponent<LinkProps> = ({
   to, className = '', activeClassName = '', onClick, ...restProps

@@ -9,23 +9,20 @@ import Link from './Link'
 export function render(opts: RenderOptions) {
   const AppContainer = opts.AppContainer || React.Fragment
   const routes = opts.routes
-  const pathname = window.location.pathname
+  const pathname = window.location.href
   const str = decodeURIComponent(window.__APP_DATA__)
   const appData = JSON.parse(str) as GlobalAppData
-  let app
-  if (appData.error) {
-    const Error = opts.Error || DefaultError
-    app = <Error error={appData.error} />
-  } else {
-    app = (
-      <Router
-        location={pathname}
-        routes={routes}
-        AppContainer={AppContainer}
-        pageProps={appData.pageProps}
-      />
-    )
-  }
+  const Error = opts.Error || DefaultError
+  const app = (
+    <Router
+      location={pathname}
+      routes={routes}
+      history={opts.history}
+      AppContainer={AppContainer}
+      pageProps={appData.pageProps}
+      error={appData.error ? <Error error={appData.error} /> : undefined}
+    />
+  )
   hydrate(app, document.querySelector(opts.container))
 }
 

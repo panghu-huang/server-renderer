@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Location } from 'history'
+import { Location, History } from 'history'
 
 export interface RouterStore {
   location: Location
@@ -14,6 +14,8 @@ export interface RouterProps {
   routes: Route[]
   AppContainer: AppContainerType
   pageProps: object
+  error?: React.ReactNode
+  history?: History
 }
 
 export interface LinkProps {
@@ -48,6 +50,7 @@ export type AppContainerProps<T = {}> = T &{
 export interface RenderOptions {
   container: string
   routes: Route[]
+  history?: History
   Error?: React.ComponentType<ErrorProps>
   AppContainer?: AppContainerType
 }

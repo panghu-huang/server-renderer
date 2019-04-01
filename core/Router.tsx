@@ -3,11 +3,12 @@ import {
   Location,
   UnregisterCallback,
   createBrowserHistory,
-  createMemoryHistory
+  createMemoryHistory,
+  History
 } from 'history'
+import { URL } from 'url'
 import { RouterContext } from './RouterContext'
 import { RouterStore, RouterProps, RouteComponent, Route } from 'index.d'
-// @ts-ignore
 import path2Regexp from 'path-to-regexp'
 
 interface RouteState {
@@ -17,54 +18,45 @@ interface RouteState {
   loading: boolean
 }
 
-const history = 'undefined' === typeof window
-  ? createMemoryHistory()
-  : createBrowserHistory()
-
 class Router extends React.Component<RouterProps, RouteState> {
 
-  public static push = history.push
-  public static replace = history.replace
-  public static go = history.go
-  public static goBack = history.goBack
+  public static push
+  public static replace
+  public static go
+  public static goBack
 
+  private readonly history: History
   private unlisten: UnregisterCallback
 
   constructor(props: RouterProps) {
     super(props)
-    const { routes, location, pageProps } = props
-    const matchedRoute = this.getMatchedRoute(routes, location)
+    const { routes, location: path, pageProps, history } = props
+    const location = this.initLocation(path)
+    const matchedRoute = this.getMatchedRoute(routes, location.pathname)
+    const component = matchedRoute && matchedRoute.component
+    this.history = this.initHistory(history)
     this.state = {
-      routerStore: {
-        location: {
-          pathname: location,
-          search: '',
-          state: null,
-          hash: '',
-        },
-      },
-      component: matchedRoute
-        ? matchedRoute.component
-        : null,
-      pageProps,
       loading: false,
+      component,
+      pageProps,
+      routerStore: {
+        location,
+      },
     }
   }
 
   public componentDidMount() {
     const { routes } = this.props
-    this.unlisten = history.listen((location: Location) => {
+    this.unlisten = this.history.listen((location: Location) => {
       const matched = this.getMatchedRoute(routes, location.pathname)
       const component = matched ? matched.component : null
-      this.setState(({ routerStore }) => {
-        return {
-          routerStore: {
-            ...routerStore, location,
-          },
-          component,
-          loading: false,
-          pageProps: undefined,
-        }
+      this.setState({
+        routerStore: {
+          location,
+        },
+        component,
+        loading: false,
+        pageProps: {},
       }, () => {
         this.fetchInitialProps(matched, location.pathname)
       })
@@ -72,15 +64,10 @@ class Router extends React.Component<RouterProps, RouteState> {
   }
 
   public render() {
-    const { AppContainer } = this.props
-    const { routerStore, component, pageProps, loading } = this.state
+    const { routerStore } = this.state
     return (
       <RouterContext.Provider value={routerStore}>
-        <AppContainer 
-          loading={loading}
-          Component={component}
-          {...pageProps}
-        />
+        {this.renderContent()}
       </RouterContext.Provider>
     )
   }
@@ -89,7 +76,25 @@ class Router extends React.Component<RouterProps, RouteState> {
     this.unlisten()
   }
 
-  private fetchInitialProps = async (matchedRoute: Route, url: string) => {
+  private renderContent() {
+    const { AppContainer, error } = this.props
+    const { component, pageProps, loading } = this.state
+    if (!component) {
+      return error
+    }
+    return (
+      <AppContainer
+        loading={loading}
+        Component={component}
+        {...pageProps}
+      />
+    )
+  }
+
+  private fetchInitialProps = async (matchedRoute: Route | null, url: string) => {
+    if (!matchedRoute) {
+      return null
+    }
     const { AppContainer } = this.props
     if (AppContainer && AppContainer.getInitialProps) {
       this.setState({ loading: true })
@@ -105,9 +110,41 @@ class Router extends React.Component<RouterProps, RouteState> {
   }
 
   private getMatchedRoute(routes: Route[], pathname: string): Route | null {
-    return routes.find(route => {
+    const matched = routes.find(route => {
       return path2Regexp(route.path, [], { strict: true }).test(pathname)
     })
+    return matched || routes.find(route => route.path === '*' || !route.path)
+  }
+
+  private initLocation(location: string) {
+    if ('undefined' === typeof window) {
+      const url = new URL(location)
+      return {
+        state: null,
+        pathname: url.pathname,
+        search: url.search,
+        hash: url.hash,
+      }
+    }
+    const { pathname, search, hash } = window.location
+    return {
+      state: null,
+      pathname,
+      search,
+      hash,
+    }
+  }
+
+  private initHistory = (history: History) => {
+    if ('undefined' === typeof window) {
+      history = createMemoryHistory()
+    }
+    history = history || createBrowserHistory()
+    Router.push = history.push
+    Router.replace = history.replace
+    Router.go = history.go
+    Router.goBack = history.goBack
+    return history
   }
 
 }

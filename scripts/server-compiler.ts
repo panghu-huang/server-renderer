@@ -21,6 +21,7 @@ let childProcess
 serverCompiler.hooks.done.tap('server-compile-done', (stats: webpack.Stats) => {
   if (childProcess) {
     childProcess.kill()
+    console.clear()
     console.log(
       chalk.green('正在重启开发服务...')
     )
