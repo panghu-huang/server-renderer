@@ -6,7 +6,7 @@ import {
   createMemoryHistory,
   History
 } from 'history'
-import { URL } from 'url'
+import { parse } from 'url'
 import { RouterContext } from './RouterContext'
 import { RouterStore, RouterProps, RouteComponent, Route } from 'index.d'
 import path2Regexp from 'path-to-regexp'
@@ -77,10 +77,12 @@ class Router extends React.Component<RouterProps, RouteState> {
   }
 
   private renderContent() {
-    const { AppContainer, error } = this.props
+    const { AppContainer, Error } = this.props
     const { component, pageProps, loading } = this.state
     if (!component) {
-      return error
+      return (
+        <Error error='Page not found' />
+      )
     }
     return (
       <AppContainer
@@ -117,21 +119,12 @@ class Router extends React.Component<RouterProps, RouteState> {
   }
 
   private initLocation(location: string) {
-    if ('undefined' === typeof window) {
-      const url = new URL(location)
-      return {
-        state: null,
-        pathname: url.pathname,
-        search: url.search,
-        hash: url.hash,
-      }
-    }
-    const { pathname, search, hash } = window.location
+    const url = parse(location)
     return {
       state: null,
-      pathname,
-      search,
-      hash,
+      pathname: url.pathname,
+      search: url.search,
+      hash: url.hash,
     }
   }
 

@@ -68,25 +68,24 @@ class Server {
         <Router
           location={fullUrl}
           AppContainer={AppContainer}
+          Error={Error}
           pageProps={{}}
           routes={routes}
-          error={(
-            <Error error='Page not found' />
-          )}
         />
       )
       return ctx.body = this.renderHTML(content, {}, 'Page not found')
     }
     const { pageProps, error } = await this.getInitialProps(
-      AppContainer, matchedRoute, url,
+      AppContainer, matchedRoute, fullUrl,
     )
     const app = renderToString(
       <Router
         location={fullUrl}
         AppContainer={AppContainer}
+        Error={Error}
         pageProps={pageProps}
         routes={routes}
-        error={error ? <Error error={error} /> : undefined}
+        error={error}
       />
     )
     ctx.body = this.renderHTML(app, pageProps, error)
@@ -108,8 +107,8 @@ class Server {
   }
 
   private renderHTML(content: string, pageProps: object, error: any) {
-    const $ = cheerio.load(this.originalHTML)
-    $(this.container).html(content)
+    const $ = cheerio.load(this.originalHTML, { decodeEntities: false })
+    $(this.container).append(content)
     $('head').append(`
       <script type='text/javascript'>
           __APP_DATA__="${encodeURIComponent(
@@ -128,7 +127,8 @@ class Server {
   private async getInitialProps(
     AppContainer: ServerRenderer.AppContainerType,
     matchedRoute: ServerRenderer.Route,
-    url: string): Promise<{ pageProps: object, error: any }> {
+    url: string
+  ): Promise<{ pageProps: object, error: any }> {
     if (AppContainer.getInitialProps) {
       try {
         const pageProps = await AppContainer.getInitialProps({

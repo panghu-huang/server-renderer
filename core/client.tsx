@@ -19,8 +19,8 @@ export function render(opts: RenderOptions) {
       routes={routes}
       history={opts.history}
       AppContainer={AppContainer}
+      Error={Error}
       pageProps={appData.pageProps}
-      error={appData.error ? <Error error={appData.error} /> : undefined}
     />
   )
   hydrate(app, document.querySelector(opts.container))

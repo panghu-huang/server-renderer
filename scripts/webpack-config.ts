@@ -150,7 +150,7 @@ function getBundlePlugins(
   }
   const envConfig = getEnvConfig(
     rootDirectory,
-    config.envFiles.concat(`.env.${isServer ? 'server' : 'client'}`)
+    isDev,
   )
   if (Object.keys(envConfig).length) {
     plugins.push(
@@ -173,7 +173,7 @@ function getSassLoaders(isServer: boolean, isDev: boolean) {
     options: {
       importLoaders: 1,
       modules: true,
-      localIdentName: '[name]_[local]--[hash:base64:4]',
+      localIdentName: '[name]_[local]__[hash:base64:4]',
     },
   }
   if (isServer) {
@@ -198,7 +198,8 @@ function getSassLoaders(isServer: boolean, isDev: boolean) {
   }
 }
 
-function getEnvConfig(rootDirectory: string, envFiles: string[]): { [n: string]: string } {
+function getEnvConfig(rootDirectory: string, isDev): { [n: string]: string } {
+  const envFiles = ['.env', `.env.${isDev ? 'development' : 'production'}`]
   const config = envFiles.reduce((config, filename) => {
     if (existsSync(filename)) {
       const content = readFileSync(join(rootDirectory, filename), 'utf-8')

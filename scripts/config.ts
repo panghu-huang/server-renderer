@@ -24,7 +24,6 @@ export interface Configuration {
   htmlPath: string
   srcDirectory: string
   customConfigFile: string
-  envFiles: string[]
 }
 
 type CustomMerge = (
@@ -58,9 +57,5 @@ export function getConfig(): Configuration {
     staticDirectory: join(rootDirectory, staticDirName),
     srcDirectory: join(rootDirectory, 'src'),
     customConfigFile: join(rootDirectory, 'server-renderer.config.js'),
-    envFiles: [
-      '.env', 
-      `.env.${process.env.NODE_ENV}`
-    ],
   }
 }

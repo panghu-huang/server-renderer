@@ -14,7 +14,8 @@ export interface RouterProps {
   routes: Route[]
   AppContainer: AppContainerType
   pageProps: object
-  error?: React.ReactNode
+  Error: React.ComponentType<ErrorProps>
+  error?: any
   history?: History
 }
 
