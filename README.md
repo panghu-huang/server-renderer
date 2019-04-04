@@ -1,6 +1,8 @@
 # ServerRenderer
 library of server side render for React
 
+[查看 Router 测试版](https://github.com/wokeyi/server-renderer/tree/develop)
+
 ## 安装
 ```bash
 $ yarn add server-renderer react react-dom
