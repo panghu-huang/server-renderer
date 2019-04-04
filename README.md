@@ -153,6 +153,26 @@ render({
 </body>
 </html>
 ```
+
+## 自定义配置
+```javascript
+const merge = require('webpack-merge')
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+
+module.exports = {
+  webpack(config, { isServer, isDev }) {
+    if (!isDev && !isServer) {
+      return merge(config, {
+        plugins: [
+          new BundleAnalyzerPlugin()
+        ]
+      })
+    }
+    return config
+  }
+}
+```
+
 ## package.json
 ```json
 {
