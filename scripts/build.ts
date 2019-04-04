@@ -22,6 +22,9 @@ async function runCompiler() {
     chalk.green('打包客户端资源文件...')
   )
   await compiler(clientConfig)
+  console.log(
+    chalk.green('资源打包完成!')
+  )
 }
 
 function compiler(config: webpack.Configuration) {
@@ -42,6 +45,7 @@ function compiler(config: webpack.Configuration) {
             chalk.red(error)
           )
         })
+        process.exit(1)
       }
       resolve()
     })
