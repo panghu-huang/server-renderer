@@ -3,9 +3,10 @@ import * as webpack from 'webpack'
 import * as MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import * as HtmlWebpackPlugin from 'html-webpack-plugin'
 import * as ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin'
-import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
-import { getHashDigest, interpolateName } from 'loader-utils'
-import { getConfig, Configuration } from './config'
+import * as mergeWebpackConfig from 'webpack-merge'
+import { existsSync, readFileSync } from 'fs'
+import { join } from 'path'
+import { getConfig, Configuration, CustomConfiguration } from './config'
 
 export interface GenerateWebpackOpts {
   rootDirectory: string
@@ -22,6 +23,7 @@ export function genWebpackConfig(opts: GenerateWebpackOpts) {
   const plugins = getBundlePlugins(opts, config)
 
   const webpackConfig: webpack.Configuration = {
+    devtool: (isDev && !isServer) ? 'source-map' : false,
     stats: isDev ? 'errors-only' : 'normal',
     mode: isDev ? 'development' : 'production',
     target: isServer ? 'node' : 'web',
@@ -98,6 +100,21 @@ export function genWebpackConfig(opts: GenerateWebpackOpts) {
     }
   }
 
+  return mergeConfig(webpackConfig, config, opts)
+}
+
+function mergeConfig(
+  webpackConfig: webpack.Configuration, 
+  config: Configuration,
+  opts: GenerateWebpackOpts
+) {
+  if (existsSync(config.customConfigFile)) {
+    const customConfig = require(config.customConfigFile) as CustomConfiguration
+    if ('function' === typeof customConfig.webpack) {
+      return customConfig.webpack(webpackConfig, opts)
+    }
+    return mergeWebpackConfig(webpackConfig, customConfig.webpack)
+  }
   return webpackConfig
 }
 
@@ -121,7 +138,6 @@ function getBundlePlugins(
             filename: '[name].css',
             chunkFilename: '[id].css',
           }),
-          // new BundleAnalyzerPlugin(),
           new webpack.optimize.ModuleConcatenationPlugin(),
           new webpack.optimize.AggressiveMergingPlugin(),
           new HtmlWebpackPlugin({
@@ -131,6 +147,15 @@ function getBundlePlugins(
         ]
       )
     }
+  }
+  const envConfig = getEnvConfig(
+    rootDirectory,
+    isDev,
+  )
+  if (Object.keys(envConfig).length) {
+    plugins.push(
+      new webpack.DefinePlugin(envConfig)
+    )
   }
   return plugins
 }
@@ -148,7 +173,7 @@ function getSassLoaders(isServer: boolean, isDev: boolean) {
     options: {
       importLoaders: 1,
       modules: true,
-      getLocalIdent,
+      localIdentName: '[name]_[local]__[hash:base64:4]',
     },
   }
   if (isServer) {
@@ -173,27 +198,19 @@ function getSassLoaders(isServer: boolean, isDev: boolean) {
   }
 }
 
-function getLocalIdent(
-  context,
-  localIdentName,
-  localName,
-  options
-) {
-  const fileNameOrFolder = context.resourcePath.match(
-    /index\.module\.(css|scss|sass)$/
-  )
-    ? '[folder]'
-    : '[name]'
-  const hash = getHashDigest(
-    context.resourcePath + localName,
-    'md5',
-    'base64',
-    5
-  )
-  const className = interpolateName(
-    context,
-    fileNameOrFolder + '_' + localName + '__' + hash,
-    options
-  )
-  return className.replace('.module', '_')
+function getEnvConfig(rootDirectory: string, isDev): { [n: string]: string } {
+  const envFiles = ['.env', `.env.${isDev ? 'development' : 'production'}`]
+  const config = envFiles.reduce((config, filename) => {
+    if (existsSync(filename)) {
+      const content = readFileSync(join(rootDirectory, filename), 'utf-8')
+      content.split('\n').forEach(line => {
+        const [key, value] = line.split('=')
+        if (key && value && key.startsWith('APP_')) {
+          config[`process.env.${key.trim()}`] = JSON.stringify(value.trim())
+        }
+      })
+    }
+    return config
+  }, {})
+  return config
 }

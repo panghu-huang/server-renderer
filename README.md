@@ -1,9 +1,9 @@
-# ServerRenderer
+# ServerRenderer - Router 测试版
 library of server side render for React
 
 ## 安装
 ```bash
-$ yarn add server-renderer react react-dom
+$ yarn add server-renderer@router react react-dom
 $ yarn add typescript tslib @types/react .... -D
 ```
 
@@ -17,6 +17,7 @@ $ yarn add typescript tslib @types/react .... -D
  ┃ ┃ ┃ ┣ 📜Home.scss
  ┃ ┃ ┃ ┗ 📜index.tsx
  ┃ ┃ ┣ 📜Other.tsx
+ ┃ ┃ ┣ 📜Notfound.tsx
  ┃ ┃ ┗ 📜index.ts
  ┃ ┣ 📜App.tsx
  ┃ ┣ 📜index.html
@@ -33,7 +34,7 @@ import { Link } from 'server-renderer'
 import classes from './Home.scss'
 
 interface HomeProps {
-  data: string
+  data: any
 }
 
 const Home: React.FunctionComponent<HomeProps> = (props) => {
@@ -60,22 +61,28 @@ Home.getInitialProps = async () => {
 export default Home
 ```
 
-> src/routes.ts
+> src/routes.tsx
 ```ts
-import { RouteProps } from 'server-renderer'
+import * as React from 'react'
+import { Route } from 'server-renderer'
 import * as pages from './pages'
 
-const routes: RouteProps[] = [
-  {
+const routes: Route[] = [
+  { 
+    name: 'home',
     path: '/',
-    exact: true,
     component: pages.Home,
   },
   {
+    name: 'others',
     path: '/others',
-    exact: true,
     component: pages.Other,
-  }
+  },
+  {
+    path: '*',
+    name: '404',
+    component: pages.Notfound,
+  },
 ]
 
 export default routes
@@ -84,34 +91,34 @@ export default routes
 > src/App.tsx
 ```tsx
 import * as React from 'react'
-import { GetInitialPropsParams } from 'server-renderer'
+import { AppContainerProps, Params } from 'server-renderer'
 
-export interface AppProps {
-  children: React.ReactNode
+interface AppProps extends AppContainerProps {
+  data: any
 }
 
 class App extends React.Component<AppProps> {
 
-  public static async getInitialProps({ route }: GetInitialPropsParams) {
-    const { component } = route
-    let pageProps = {}
-    if (component && component.getInitialProps) {
-      pageProps = await component.getInitialProps()
+  public static async getInitialProps({ url, Component }: Params) {
+    if (Component.getInitialProps) {
+      const data =  await Component.getInitialProps({ url })
+      return { data }
     }
-    return pageProps
+    return {
+      data: {},
+    }
   }
 
   public render() {
-    const { children } = this.props
+    const { Component, data } = this.props
     return (
-      <div>
-        <p>App Component</p>
-        {children}
-      </div>
+      <Component 
+        {...data}
+      />
     )
   }
-}
 
+}
 
 export default App
 ```
@@ -119,13 +126,15 @@ export default App
 > src/index.tsx
 ```ts
 import { render } from 'server-renderer'
+import { Error } from 'path/to/your/components'
 import routes from './routes'
 import App from './App'
 
 render({
   container: '.app-container',
-  routes,
   AppContainer: App,
+  Error,
+  routes,
 })
 ```
 
@@ -159,7 +168,7 @@ render({
   "dependencies": {
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
-    "server-renderer": "^0.1.5"
+    "server-renderer": "^0.2.6"
   },
   "devDependencies": {
     "@types/history": "^4.7.2",
@@ -184,4 +193,15 @@ $ yarn dev
 ```bash
 $ yarn build
 $ yarn start
+```
+## Dockerfile
+
+```dockerfile
+FROM node
+WORKDIR /path/to/workdir
+COPY . /path/to/workdir
+RUN yarn install
+RUN yarn build
+EXPOSE 3030
+CMD yarn start
 ```

@@ -1,33 +1,30 @@
 import * as React from 'react'
 import { hydrate } from 'react-dom'
-import { Router, matchPath } from 'react-router-dom'
-import { createBrowserHistory } from 'history'
-import Container from './Container'
+import { RouterContext } from './RouterContext'
+import { RenderOptions, GlobalAppData } from 'index.d'
+import Router from './Router'
+import DefaultError from './Error'
+import Link from './Link'
 
-import ServerRenderer = require('index')
-
-export function render(opts: ServerRenderer.RenderOptions) {
+export function render(opts: RenderOptions) {
   const AppContainer = opts.AppContainer || React.Fragment
   const routes = opts.routes
-  const pathname = window.location.pathname
-  const history = opts.history || createBrowserHistory()
-  const matchedIndex = routes.findIndex(route => {
-    return !!matchPath(pathname, route)
-  })
+  const pathname = window.location.href
   const str = decodeURIComponent(window.__APP_DATA__)
-  const appData = JSON.parse(str) as ServerRenderer.GlobalAppData
+  const appData = JSON.parse(str) as GlobalAppData
+  const Error = opts.Error || DefaultError
   const app = (
-    <Router history={history}>
-      <Container 
-        routes={routes}
-        pageProps={appData.pageProps}
-        matchedIndex={matchedIndex}
-        AppContainer={AppContainer}
-      />
-    </Router>
+    <Router
+      location={pathname}
+      routes={routes}
+      history={opts.history}
+      AppContainer={AppContainer}
+      Error={Error}
+      pageProps={appData.pageProps}
+    />
   )
   hydrate(app, document.querySelector(opts.container))
 }
 
-export * from 'react-router-dom'
+export { Router, Link, RouterContext }
 export * from 'history'
