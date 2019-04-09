@@ -29,7 +29,7 @@ $ yarn add typescript tslib @types/react .... -D
 > src/pages/Home/index.tsx
 ```tsx
 import * as React from 'react'
-import { Link } from 'server-renderer'
+import { Link, router } from 'server-renderer'
 // CSS Modules
 import classes from './Home.scss'
 
@@ -38,7 +38,7 @@ interface HomeProps {
 }
 
 const Home: React.FunctionComponent<HomeProps> = (props) => {
-  const handler = () => console.log('clicked')
+  const handler = () => router.push('/others')
   return (
     <div className={classes.container}>
       <p className={classes.content}>
@@ -64,8 +64,8 @@ export default Home
 > src/routes.tsx
 ```ts
 import * as React from 'react'
-import { Route } from 'server-renderer'
 import * as pages from './pages'
+import { Route } from 'server-renderer'
 
 const routes: Route[] = [
   { 
@@ -91,13 +91,9 @@ export default routes
 > src/App.tsx
 ```tsx
 import * as React from 'react'
-import { AppContainerProps, Params } from 'server-renderer'
+import { AppProps, Params } from 'server-renderer'
 
-interface AppProps extends AppContainerProps {
-  data: any
-}
-
-class App extends React.Component<AppProps> {
+class App extends React.Component<AppProps<{ data: any }> {
 
   public static async getInitialProps({ url, Component }: Params) {
     if (Component.getInitialProps) {
@@ -132,7 +128,7 @@ import App from './App'
 
 render({
   container: '.app-container',
-  AppContainer: App,
+  App,
   Error,
   routes,
 })
@@ -188,7 +184,7 @@ module.exports = {
   "dependencies": {
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
-    "server-renderer": "^0.2.6"
+    "server-renderer": "^0.2.7"
   },
   "devDependencies": {
     "@types/history": "^4.7.2",
