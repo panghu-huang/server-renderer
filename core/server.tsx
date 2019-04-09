@@ -4,12 +4,14 @@ import * as KoaRouter from 'koa-router'
 import * as cheerio from 'cheerio'
 import { readFileSync } from 'fs'
 import { URL } from 'url'
-import { RouterContext } from './RouterContext'
 import { renderToString } from 'react-dom/server'
+import { RouterContext } from './RouterContext'
+import { router } from './router'
 import { getConfig } from 'scripts/config'
 import path2Regexp from 'path-to-regexp'
 import send from 'koa-send'
-import Router from './Router'
+import RouterContainer from './RouterContainer'
+import Container from './Container'
 import Link from './Link'
 import Error from './Error'
 
@@ -24,7 +26,7 @@ class Server {
   private readonly clientChunkPath: URL
   private readonly container: string
   private readonly originalHTML: string
-  private readonly AppContainer: ServerRenderer.AppContainerType
+  private readonly App: ServerRenderer.AppComponentType
   private readonly Error: React.ComponentType<ServerRenderer.ErrorProps>
   private readonly routes: ServerRenderer.Route[]
 
@@ -34,7 +36,7 @@ class Server {
       `http://localhost:${config.webpackServerPort}${config.clientPublicPath}`
     )
     this.container = opts.container
-    this.AppContainer = opts.AppContainer || React.Fragment
+    this.App = opts.App || React.Fragment
     this.Error = opts.Error || Error
     this.routes = opts.routes
     const htmlPath = isDev ? config.htmlTemplatePath : config.htmlPath
@@ -61,34 +63,23 @@ class Server {
     const matchedRoute = routes.find(route => {
       return path2Regexp(route.path, [], { strict: true }).test(url)
     })
-    const AppContainer = this.AppContainer
+    const App = this.App
     const Error = this.Error
-    if (!matchedRoute) {
-      const content = renderToString(
-        <Router
-          location={fullUrl}
-          AppContainer={AppContainer}
-          Error={Error}
-          pageProps={{}}
-          routes={routes}
-        />
-      )
-      return ctx.body = this.renderHTML(content, {}, 'Page not found')
-    }
-    const { pageProps, error } = await this.getInitialProps(
-      AppContainer, matchedRoute, fullUrl,
+    const pageProps = await this.getInitialProps(
+      App, matchedRoute, fullUrl,
     )
     const app = renderToString(
-      <Router
-        location={fullUrl}
-        AppContainer={AppContainer}
-        Error={Error}
-        pageProps={pageProps}
-        routes={routes}
-        error={error}
-      />
+      <RouterContainer location={fullUrl}>
+          <Container 
+            location={fullUrl}
+            App={App}
+            Error={Error}
+            pageProps={pageProps}
+            routes={routes}
+          />
+        </RouterContainer>
     )
-    ctx.body = this.renderHTML(app, pageProps, error)
+    ctx.body = this.renderHTML(app, pageProps)
   }
 
   private async serveFiles(ctx: Koa.ParameterizedContext, next: () => Promise<void>) {
@@ -106,13 +97,13 @@ class Server {
     }
   }
 
-  private renderHTML(content: string, pageProps: object, error: any) {
+  private renderHTML(content: string, pageProps: object) {
     const $ = cheerio.load(this.originalHTML, { decodeEntities: false })
     $(this.container).append(content)
     $('head').append(`
       <script type='text/javascript'>
           __APP_DATA__="${encodeURIComponent(
-      JSON.stringify({ pageProps, error }))
+      JSON.stringify({ pageProps }))
       }"
       </script>
     `)
@@ -125,25 +116,18 @@ class Server {
   }
 
   private async getInitialProps(
-    AppContainer: ServerRenderer.AppContainerType,
+    AppContainer: ServerRenderer.AppComponentType,
     matchedRoute: ServerRenderer.Route,
     url: string
-  ): Promise<{ pageProps: object, error: any }> {
-    if (AppContainer.getInitialProps) {
-      try {
-        const pageProps = await AppContainer.getInitialProps({
-          Component: matchedRoute.component,
-          url,
-        })
-        return { pageProps, error: null }
-      } catch (error) {
-        return { pageProps: {}, error }
-      }
+  ): Promise<object> {
+    if (matchedRoute && AppContainer.getInitialProps) {
+      const pageProps = await AppContainer.getInitialProps({
+        Component: matchedRoute.component,
+        url,
+      })
+      return pageProps
     }
-    return {
-      pageProps: {},
-      error: null,
-    }
+    return {}
   }
 
 }
@@ -154,4 +138,4 @@ export function render(opts: ServerRenderer.RenderOptions) {
 }
 
 export * from 'history'
-export { Router, Link, RouterContext }
+export { router, Link, RouterContext }
