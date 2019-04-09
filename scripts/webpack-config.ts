@@ -4,9 +4,9 @@ import * as MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import * as HtmlWebpackPlugin from 'html-webpack-plugin'
 import * as ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin'
 import * as mergeWebpackConfig from 'webpack-merge'
+import { getConfig, Configuration, CustomConfiguration } from './config'
 import { existsSync, readFileSync } from 'fs'
 import { join } from 'path'
-import { getConfig, Configuration, CustomConfiguration } from './config'
 
 export interface GenerateWebpackOpts {
   rootDirectory: string

@@ -10,8 +10,9 @@ export function render(opts: RenderOptions) {
   const AppContainer = opts.AppContainer || React.Fragment
   const routes = opts.routes
   const pathname = window.location.href
-  const str = decodeURIComponent(window.__APP_DATA__)
-  const appData = JSON.parse(str) as GlobalAppData
+  const appData: GlobalAppData = JSON.parse(
+    decodeURIComponent(window.__APP_DATA__)
+  )
   const Error = opts.Error || DefaultError
   const app = (
     <Router

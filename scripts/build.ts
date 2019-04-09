@@ -10,8 +10,12 @@ runCompiler()
 async function runCompiler() {
   const rootDirectory = process.cwd()
   const config = getConfig()
-  const clientConfig = genWebpackConfig({ isDev: false, isServer: false, rootDirectory, })
-  const serverConfig = genWebpackConfig({ isDev: false, isServer: true, rootDirectory, })
+  const clientConfig = genWebpackConfig({ 
+    isDev: false, isServer: false, rootDirectory, 
+  })
+  const serverConfig = genWebpackConfig({ 
+    isDev: false, isServer: true, rootDirectory, 
+  })
   rmdir(config.buildDirectory)
   rmdir(config.staticDirectory)
   console.log(
@@ -56,8 +60,8 @@ function rmdir(directory: string) {
   if (fs.existsSync(directory)) {
     const files = fs.readdirSync(directory)
     if (files.length) {
-      files.forEach(file => {
-        const filePath = join(directory, file)
+      files.forEach(filename => {
+        const filePath = join(directory, filename)
         const stats = fs.statSync(filePath)
         if (stats.isDirectory()) {
           rmdir(filePath)

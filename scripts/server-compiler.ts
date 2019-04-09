@@ -1,8 +1,8 @@
 import * as webpack from 'webpack'
 import * as WebpackDevMiddleware from 'webpack-dev-middleware'
+import { genWebpackConfig } from './webpack-config'
 import { fork } from 'child_process'
 import { join } from 'path'
-import { genWebpackConfig } from './webpack-config'
 import chalk from 'chalk'
 
 const rootDirectory = process.cwd()
@@ -29,5 +29,5 @@ serverCompiler.hooks.done.tap('server-compile-done', (stats: webpack.Stats) => {
   const assets = stats.toJson().assetsByChunkName
   const chunkName = join(serverDevConfig.output.path, assets.main)
   // @ts-ignore
-  childProcess = fork(chunkName, {}, { stdio: "inherit" })
+  childProcess = fork(chunkName, {}, { stdio: 'inherit' })
 })
