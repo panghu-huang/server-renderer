@@ -9,14 +9,18 @@ export interface ErrorProps {
   error: any
 }
 
-export interface RouterProps {
-  location: string
+export interface ContainerProps {
   routes: Route[]
-  AppContainer: AppContainerType
+  App: AppComponentType
   pageProps: object
   Error: React.ComponentType<ErrorProps>
+  location: string
   error?: any
-  history?: History
+}
+
+export interface RouterContainerProps {
+  location: string
+  children?: React.ReactNode
 }
 
 export interface LinkProps {
@@ -36,25 +40,24 @@ export interface Route {
   component: RouteComponent
 }
 
-export type AppContainerType = React.ComponentType<AppContainerProps>
+export type AppComponentType = React.ComponentType<AppProps>
 
 export interface GlobalAppData {
   pageProps: object
-  error: any
 }
 
-export type AppContainerProps<T = {}> = T &{
-  loading: boolean
+export type AppProps<T = {}> = T &{
   Component: React.ComponentType<any>
 }
 
 export interface RenderOptions {
   container: string
   routes: Route[]
-  history?: History
   Error?: React.ComponentType<ErrorProps>
-  AppContainer?: AppContainerType
+  App?: AppComponentType
 }
+
+export type Subscriber = (location: Location) => void
 
 export interface Params {
   Component: React.ComponentType<any>
@@ -63,11 +66,12 @@ export interface Params {
 
 export const Link: React.FunctionComponent<LinkProps>
 
-export class Router extends React.Component<RouterProps> {
+export class router {
   public static push(path: string, state?: any): void
   public static replace(path: string, state?: any): void
   public static go(n: number): void
   public static goBack(): void
+  public static subscribe(subscriber: Subscriber): void
 }
 
 export const RouterContext: React.Context<RouterStore>

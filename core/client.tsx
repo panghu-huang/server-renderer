@@ -1,31 +1,34 @@
 import * as React from 'react'
 import { hydrate } from 'react-dom'
 import { RouterContext } from './RouterContext'
+import { router } from './router'
 import { RenderOptions, GlobalAppData } from 'index.d'
-import Router from './Router'
+import RouterContainer from './RouterContainer'
+import Container from './Container'
 import DefaultError from './Error'
 import Link from './Link'
 
 export function render(opts: RenderOptions) {
-  const AppContainer = opts.AppContainer || React.Fragment
+  const App = opts.App || React.Fragment
   const routes = opts.routes
-  const pathname = window.location.href
+  const url = window.location.href
   const appData: GlobalAppData = JSON.parse(
     decodeURIComponent(window.__APP_DATA__)
   )
   const Error = opts.Error || DefaultError
   const app = (
-    <Router
-      location={pathname}
-      routes={routes}
-      history={opts.history}
-      AppContainer={AppContainer}
-      Error={Error}
-      pageProps={appData.pageProps}
-    />
+    <RouterContainer location={url}>
+      <Container
+        location={url}
+        routes={routes}
+        App={App}
+        Error={Error}
+        pageProps={appData.pageProps}
+      />
+    </RouterContainer>
   )
   hydrate(app, document.querySelector(opts.container))
 }
 
-export { Router, Link, RouterContext }
+export { router, Link, RouterContext }
 export * from 'history'

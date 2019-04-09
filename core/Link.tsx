@@ -1,32 +1,37 @@
 import * as React from 'react'
 import { RouterContext } from './RouterContext'
+import { router } from './router'
 import { LinkProps } from 'index.d'
 import path2Regexp from 'path-to-regexp'
-import Router from './Router'
 
 const Link: React.FunctionComponent<LinkProps> = ({
-  to, className = '', activeClassName = '', onClick, ...restProps
+  className, activeClassName, to, onClick, ...restProps
 }) => {
   const { location } = React.useContext(RouterContext)
   const matched = path2Regexp(location.pathname).test(to)
   const cls = className + matched ? activeClassName : ''
   const handleClick = (evt: React.MouseEvent) => {
     if (onClick) {
-      return onClick(evt)
+      onClick(evt)
     }
     if (!evt.isDefaultPrevented()) {
       evt.preventDefault()
-      Router.push(to)
+      router.push(to)
     }
   }
   return (
-    <a 
-      href={to} 
+    <a
+      href={to}
       className={cls}
-      onClick={handleClick} 
+      onClick={handleClick}
       {...restProps}
     />
   )
+}
+
+Link.defaultProps = {
+  className: '',
+  activeClassName: '',
 }
 
 export default Link
