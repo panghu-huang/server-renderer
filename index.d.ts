@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { ParameterizedContext } from 'koa'
 import { Location, History } from 'history'
 
 export interface RouterStore {
@@ -62,6 +63,7 @@ export type Subscriber = (location: Location) => void
 export interface Params {
   Component: React.ComponentType<any>
   url: string
+  ctx?: ParameterizedContext
 }
 
 export const Link: React.FunctionComponent<LinkProps>

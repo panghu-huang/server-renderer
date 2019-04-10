@@ -66,7 +66,7 @@ class Server {
     const App = this.App
     const Error = this.Error
     const pageProps = await this.getInitialProps(
-      App, matchedRoute, fullUrl,
+      ctx, App, matchedRoute, fullUrl,
     )
     const app = renderToString(
       <RouterContainer location={fullUrl}>
@@ -114,6 +114,7 @@ class Server {
   }
 
   private async getInitialProps(
+    ctx: Koa.ParameterizedContext,
     AppContainer: ServerRenderer.AppComponentType,
     matchedRoute: ServerRenderer.Route,
     url: string
@@ -122,6 +123,7 @@ class Server {
       const pageProps = await AppContainer.getInitialProps({
         Component: matchedRoute.component,
         url,
+        ctx,
       })
       return pageProps
     }

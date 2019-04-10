@@ -1,9 +1,9 @@
-# ServerRenderer - Router 测试版
-library of server side render for React
+# ServerRenderer
+🎉🎉🎉library of server side render for React
 
 ## 安装
 ```bash
-$ yarn add server-renderer@router react react-dom
+$ yarn add server-renderer react react-dom
 $ yarn add typescript tslib @types/react .... -D
 ```
 
@@ -184,7 +184,7 @@ module.exports = {
   "dependencies": {
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
-    "server-renderer": "^0.2.7"
+    "server-renderer": "^0.2.10"
   },
   "devDependencies": {
     "@types/history": "^4.7.2",
