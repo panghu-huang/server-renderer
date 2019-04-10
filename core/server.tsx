@@ -98,13 +98,11 @@ class Server {
   }
 
   private renderHTML(content: string, pageProps: object) {
-    const $ = cheerio.load(this.originalHTML, { decodeEntities: false })
-    $(this.container).append(content)
+    const $ = cheerio.load(this.originalHTML, { decodeEntities: true })
+    $(this.container).html(content)
     $('head').append(`
       <script type='text/javascript'>
-          __APP_DATA__="${encodeURIComponent(
-      JSON.stringify({ pageProps }))
-      }"
+          __APP_DATA__="${encodeURIComponent(JSON.stringify({ pageProps }))}"
       </script>
     `)
     if (isDev) {

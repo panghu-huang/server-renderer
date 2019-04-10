@@ -62,7 +62,7 @@ class Container extends React.PureComponent<ContainerProps, RouteState> {
       component: matchedRoute ? matchedRoute.component : null,
       pageProps: {},
     })
-    this.fetchInitialProps(matchedRoute, location.toString())
+    this.fetchInitialProps(matchedRoute, window.location.toString())
   }
 
   private getMatchedRoute(routes: Route[], pathname: string): Route | null {

@@ -35,7 +35,6 @@ class Router extends React.Component<Props, RouterStore> {
     )
   }
 
-
   private handleHistoryChange = (location: Location) => {
     this.setState({ location })
   }
