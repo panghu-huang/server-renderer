@@ -1,6 +1,6 @@
 {
   "name": "server-renderer",
-  "version": "0.2.10",
+  "version": "0.2.11",
   "main": "lib/index.js",
   "typings": "./index.d.ts",
   "license": "MIT",
@@ -39,13 +39,13 @@
     "ts-loader": "^5.3.3",
     "webpack": "^4.29.6",
     "webpack-dev-middleware": "^3.6.1",
+    "@types/koa": "^2.0.48",
     "webpack-merge": "^4.2.1"
   },
   "devDependencies": {
     "@taskr/typescript": "^1.1.0",
     "@types/cheerio": "^0.22.11",
     "@types/commander": "^2.12.2",
-    "@types/koa": "^2.0.48",
     "@types/koa-router": "^7.0.40",
     "@types/koa-send": "^4.1.2",
     "@types/loader-utils": "^1.1.3",
