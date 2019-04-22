@@ -17,7 +17,6 @@ export interface GenerateWebpackOpts {
 export function genWebpackConfig(opts: GenerateWebpackOpts) {
   const { rootDirectory, isDev = false, isServer = false } = opts
   const config = getConfig()
-  const resolve = absolutePath => path.resolve(rootDirectory, absolutePath)
 
   const outputDirectory = getOutputDirectoty(config, isDev, isServer)
   const plugins = getBundlePlugins(opts, config)
@@ -27,7 +26,7 @@ export function genWebpackConfig(opts: GenerateWebpackOpts) {
     stats: isDev ? 'errors-only' : 'normal',
     mode: isDev ? 'development' : 'production',
     target: isServer ? 'node' : 'web',
-    entry: resolve('src/index.tsx'),
+    entry: path.resolve(config.srcDirectory, 'index.tsx'),
     output: {
       path: outputDirectory,
       publicPath: isServer 

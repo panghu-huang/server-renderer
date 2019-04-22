@@ -27,7 +27,7 @@ serverCompiler.hooks.done.tap('server-compile-done', (stats: webpack.Stats) => {
     )
   }
   const assets = stats.toJson().assetsByChunkName
-  const chunkName = join(serverDevConfig.output.path, assets.main)
+  const chunkPath = join(serverDevConfig.output.path, assets.main)
   // @ts-ignore
-  childProcess = fork(chunkName, {}, { stdio: 'inherit' })
+  childProcess = fork(chunkPath, {}, { stdio: 'inherit' })
 })

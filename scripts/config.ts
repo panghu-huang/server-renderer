@@ -41,6 +41,7 @@ export function getConfig(): Configuration {
   const htmlFilename = 'client.html'
   const staticDirName = 'static'
   const buildDirName = 'build'
+  const srcDirectory = join(rootDirectory, 'src')
   return {
     htmlFilename,
     buildDirName,
@@ -51,11 +52,11 @@ export function getConfig(): Configuration {
     serverPort: DEFAULT_DEV_SERVER_PORT,
     clientPublicPath: DEFAULT_CLIENT_PUBLIC_PATH,
     serverPublicPath: DEFAULT_SERVER_PUBLIC_PATH,
-    htmlTemplatePath: join(rootDirectory, 'src/index.html'),
+    htmlTemplatePath: join(srcDirectory, 'index.html'),
     htmlPath: join(rootDirectory, staticDirName, 'client.html'),
     buildDirectory: join(rootDirectory, buildDirName),
     staticDirectory: join(rootDirectory, staticDirName),
-    srcDirectory: join(rootDirectory, 'src'),
+    srcDirectory,
     customConfigFile: join(rootDirectory, 'server-renderer.config.js'),
   }
 }

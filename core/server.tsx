@@ -22,7 +22,6 @@ const isDev = process.env.NODE_ENV === 'development'
 
 class Server {
 
-  private readonly port = config.serverPort
   private readonly clientChunkPath: URL
   private readonly container: string
   private readonly originalHTML: string
@@ -46,13 +45,14 @@ class Server {
   public start() {
     const app = new Koa()
     const router = new KoaRouter()
+    const port = config.serverPort
     if (!isDev) {
       app.use(this.serveFiles)
     }
     router.get('*', this.handleRequest.bind(this))
     app.use(router.routes())
-    app.listen(this.port, () => {
-      console.log('Server listen on: http://localhost:' + this.port)
+    app.listen(port, () => {
+      console.log('Server listen on: http://localhost:' + port)
     })
   }
 
@@ -68,7 +68,7 @@ class Server {
     const pageProps = await this.getInitialProps(
       ctx, App, matchedRoute, fullUrl,
     )
-    const app = renderToString(
+    const content = renderToString(
       <RouterContainer location={fullUrl}>
           <Container 
             location={fullUrl}
@@ -79,7 +79,7 @@ class Server {
           />
         </RouterContainer>
     )
-    ctx.body = this.renderHTML(app, pageProps)
+    ctx.body = this.renderHTML(content, pageProps)
   }
 
   private async serveFiles(ctx: Koa.ParameterizedContext, next: () => Promise<void>) {

@@ -33,12 +33,10 @@ export interface LinkProps {
   children?: React.ReactNode
 }
 
-export type RouteComponent = React.ComponentType<any>
-
 export interface Route {
   name: string
   path: string
-  component: RouteComponent
+  component: React.ComponentType<any>
 }
 
 export type AppComponentType = React.ComponentType<AppProps>
