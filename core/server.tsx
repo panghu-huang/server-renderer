@@ -6,11 +6,11 @@ import { readFileSync } from 'fs'
 import { URL } from 'url'
 import { renderToString } from 'react-dom/server'
 import { RouterContext } from './RouterContext'
-import { router } from './router'
+import { history } from './history'
 import { getConfig } from 'scripts/config'
 import path2Regexp from 'path-to-regexp'
 import send from 'koa-send'
-import RouterContainer from './RouterContainer'
+import Router from './Router'
 import Container from './Container'
 import Link from './Link'
 import Error from './Error'
@@ -69,7 +69,7 @@ class Server {
       ctx, App, matchedRoute, fullUrl,
     )
     const content = renderToString(
-      <RouterContainer location={fullUrl}>
+      <Router location={fullUrl}>
           <Container 
             location={fullUrl}
             App={App}
@@ -77,7 +77,7 @@ class Server {
             pageProps={pageProps}
             routes={routes}
           />
-        </RouterContainer>
+        </Router>
     )
     ctx.body = this.renderHTML(content, pageProps)
   }
@@ -138,4 +138,4 @@ export function render(opts: ServerRenderer.RenderOptions) {
 }
 
 export * from 'history'
-export { router, Link, RouterContext }
+export { history, Link, RouterContext }

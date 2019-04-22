@@ -1,20 +1,15 @@
-import { 
-  History, 
-  Location,
-  createBrowserHistory, 
-  createMemoryHistory 
-} from 'history'
+import * as H from 'history'
 import { Subscriber } from 'index.d'
 
-class Router {
+class History {
 
-  public readonly history: History
+  public readonly history: H.History
   private subscriptions: Subscriber[] = []
 
   constructor() {
     const history = 'undefined' === typeof window
-      ? createMemoryHistory()
-      : createBrowserHistory()
+      ? H.createMemoryHistory()
+      : H.createBrowserHistory()
     history.listen(this.handleHistoryChange)
     this.history = history
   }
@@ -39,11 +34,11 @@ class Router {
     this.subscriptions.push(subscriber)
   }
 
-  private handleHistoryChange = (location: Location) => {
+  private handleHistoryChange = (location: H.Location) => {
     const subscriptions = this.subscriptions
     subscriptions.forEach(subscriber => subscriber(location))
   }
 
 }
 
-export const router = new Router()
+export const history = new History()

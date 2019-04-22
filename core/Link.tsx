@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { RouterContext } from './RouterContext'
-import { router } from './router'
+import { history } from './history'
 import { LinkProps } from 'index.d'
 import path2Regexp from 'path-to-regexp'
 
@@ -16,7 +16,7 @@ const Link: React.FunctionComponent<LinkProps> = ({
     }
     if (!evt.isDefaultPrevented()) {
       evt.preventDefault()
-      router.push(to)
+      history.push(to)
     }
   }
   return (

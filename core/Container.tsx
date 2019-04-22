@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { parse } from 'url'
 import { Location } from 'history'
-import { router } from './router'
-import { ContainerProps, RouteComponent, Route } from 'index.d'
+import { history } from './history'
+import { ContainerProps, Route } from 'index.d'
 import path2Regexp from 'path-to-regexp'
 
 interface RouteState {
-  component: RouteComponent | null
+  component: React.ComponentType<any> | null
   pageProps: object
 }
 
@@ -21,9 +21,8 @@ class Container extends React.PureComponent<ContainerProps, RouteState> {
       component,
       pageProps,
     }
-    router.subscribe(this.handleHistoryChange)
+    history.subscribe(this.handleHistoryChange)
   }
-
 
   public render() {
     const { App, Error } = this.props

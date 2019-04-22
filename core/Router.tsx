@@ -2,7 +2,7 @@ import * as React from 'react'
 import { parse } from 'url'
 import { Location } from 'history'
 import { RouterContext } from './RouterContext'
-import { router } from './router'
+import { history } from './history'
 import { RouterContainerProps, RouterStore } from 'index.d'
 
 type Props = RouterContainerProps
@@ -20,7 +20,7 @@ class Router extends React.Component<Props, RouterStore> {
         hash: url.hash,
       },
     }
-    router.subscribe(this.handleHistoryChange)
+    history.subscribe(this.handleHistoryChange)
   }
 
   public shouldComponentUpdate(nextProps: Props, nextState: RouterStore) {

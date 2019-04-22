@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { hydrate } from 'react-dom'
 import { RouterContext } from './RouterContext'
-import { router } from './router'
+import { history } from './history'
 import { RenderOptions, GlobalAppData } from 'index.d'
-import RouterContainer from './RouterContainer'
+import Router from './Router'
 import Container from './Container'
 import DefaultError from './Error'
 import Link from './Link'
@@ -17,7 +17,7 @@ export function render(opts: RenderOptions) {
   )
   const Error = opts.Error || DefaultError
   const app = (
-    <RouterContainer location={url}>
+    <Router location={url}>
       <Container
         location={url}
         routes={routes}
@@ -25,10 +25,10 @@ export function render(opts: RenderOptions) {
         Error={Error}
         pageProps={appData.pageProps}
       />
-    </RouterContainer>
+    </Router>
   )
   hydrate(app, document.querySelector(opts.container))
 }
 
-export { router, Link, RouterContext }
+export { history, Link, RouterContext }
 export * from 'history'
