@@ -3,13 +3,14 @@ import { hydrate } from 'react-dom'
 import { RouterContext } from './RouterContext'
 import { history } from './history'
 import { RenderOptions, GlobalAppData } from 'index.d'
+import DefaultApp from './DefaultApp'
 import Router from './Router'
 import Container from './Container'
 import DefaultError from './Error'
 import Link from './Link'
 
 export function render(opts: RenderOptions) {
-  const App = opts.App || React.Fragment
+  const App = opts.App || DefaultApp
   const routes = opts.routes
   const url = window.location.href
   const appData: GlobalAppData = JSON.parse(

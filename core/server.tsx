@@ -10,6 +10,7 @@ import { history } from './history'
 import { getConfig } from 'scripts/config'
 import path2Regexp from 'path-to-regexp'
 import send from 'koa-send'
+import DefaultApp from './DefaultApp'
 import Router from './Router'
 import Container from './Container'
 import Link from './Link'
@@ -35,7 +36,7 @@ class Server {
       `http://localhost:${config.webpackServerPort}${config.clientPublicPath}`
     )
     this.container = opts.container
-    this.App = opts.App || React.Fragment
+    this.App = opts.App || DefaultApp
     this.Error = opts.Error || Error
     this.routes = opts.routes
     const htmlPath = isDev ? config.htmlTemplatePath : config.htmlPath
