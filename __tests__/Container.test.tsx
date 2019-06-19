@@ -40,7 +40,7 @@ describe('Container', () => {
     const wrapper = mount(
       <Container
         routes={routes}
-        location='http://locahost/'
+        location='http://localhost/'
         Error={Error}
         App={App}
         pageProps={{}}
@@ -53,7 +53,7 @@ describe('Container', () => {
     const wrapper = mount(
       <Container
         routes={routes}
-        location='http://locahost/others'
+        location='http://localhost/others'
         Error={Error}
         App={App}
         pageProps={{}}
@@ -66,7 +66,7 @@ describe('Container', () => {
     const wrapper = mount(
       <Container
         routes={routes}
-        location='http://locahost/notfound'
+        location='http://localhost/notfound'
         Error={Error}
         App={App}
         pageProps={{}}
@@ -81,7 +81,7 @@ describe('Container', () => {
     const wrapper = mount(
       <Container
         routes={routes}
-        location='http://locahost/props'
+        location='http://localhost/props'
         Error={Error}
         App={App}
         pageProps={{ data }}

@@ -1,9 +1,9 @@
 import * as React from 'react'
-import * as path2Regexp from 'path-to-regexp'
 import { parse } from 'url'
 import { Location } from 'history'
 import { history } from './history'
 import { ContainerProps, Route } from 'index.d'
+import path2Regexp from 'path-to-regexp'
 
 interface RouteState {
   component: React.ComponentType<any> | null

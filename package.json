@@ -1,6 +1,6 @@
 {
   "name": "server-renderer",
-  "version": "0.2.11",
+  "version": "0.2.15",
   "main": "lib/index.js",
   "typings": "./index.d.ts",
   "license": "MIT",
@@ -25,6 +25,7 @@
     "chalk": "^2.4.2",
     "cheerio": "^1.0.0-rc.2",
     "commander": "^2.19.0",
+    "copy-webpack-plugin": "^5.0.3",
     "css-loader": "^2.1.1",
     "fork-ts-checker-webpack-plugin": "^1.0.0",
     "history": "^4.9.0",
