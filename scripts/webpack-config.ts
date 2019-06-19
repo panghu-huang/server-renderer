@@ -2,6 +2,7 @@ import * as path from 'path'
 import * as webpack from 'webpack'
 import * as MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import * as HtmlWebpackPlugin from 'html-webpack-plugin'
+import * as CopyWebpackPlugin from 'copy-webpack-plugin'
 import * as ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin'
 import * as mergeWebpackConfig from 'webpack-merge'
 import { getConfig, Configuration, CustomConfiguration } from './config'
@@ -15,10 +16,10 @@ export interface GenerateWebpackOpts {
 }
 
 export function genWebpackConfig(opts: GenerateWebpackOpts) {
-  const { rootDirectory, isDev = false, isServer = false } = opts
+  const { isDev = false, isServer = false } = opts
   const config = getConfig()
 
-  const outputDirectory = getOutputDirectoty(config, isDev, isServer)
+  const outputDirectory = getOutputDirectory(config, isDev, isServer)
   const plugins = getBundlePlugins(opts, config)
 
   const webpackConfig: webpack.Configuration = {
@@ -29,11 +30,11 @@ export function genWebpackConfig(opts: GenerateWebpackOpts) {
     entry: path.resolve(config.srcDirectory, 'index.tsx'),
     output: {
       path: outputDirectory,
-      publicPath: isServer 
-      ? config.serverPublicPath 
+      publicPath: isServer
+      ? config.serverPublicPath
       : config.clientPublicPath,
-      filename: isServer 
-        ? config.serverChunkName 
+      filename: isServer
+        ? config.serverChunkName
         : config.clientChunkName,
       libraryTarget: isServer ? 'commonjs2' : 'umd',
       pathinfo: false,
@@ -41,8 +42,8 @@ export function genWebpackConfig(opts: GenerateWebpackOpts) {
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.d.ts'],
       alias: {
-        'server-renderer': isServer 
-          ? 'server-renderer/lib/server.js' 
+        'server-renderer': isServer
+          ? 'server-renderer/lib/server.js'
           : 'server-renderer/lib/client.js',
         src: config.srcDirectory,
       },
@@ -88,7 +89,7 @@ export function genWebpackConfig(opts: GenerateWebpackOpts) {
         minimize: !isDev && !isServer,
       },
   }
-  
+
   if (!isServer) {
     webpackConfig.node = {
       dgram: 'empty',
@@ -103,7 +104,7 @@ export function genWebpackConfig(opts: GenerateWebpackOpts) {
 }
 
 function mergeConfig(
-  webpackConfig: webpack.Configuration, 
+  webpackConfig: webpack.Configuration,
   config: Configuration,
   opts: GenerateWebpackOpts
 ) {
@@ -123,27 +124,41 @@ function getBundlePlugins(
 ) {
   let plugins = []
   if (!isServer) {
-    // 客户端
-    plugins.push(
-      new ForkTsCheckerWebpackPlugin({
-        tsconfig: path.join(rootDirectory, 'tsconfig.json'),
-        tslint: path.join(rootDirectory, 'tslint.json'),
-      })
-    )
-    if (!isDev) {
+    if (isDev) {
+      // 客户端
+      plugins.push(
+        new ForkTsCheckerWebpackPlugin({
+          tsconfig: path.join(rootDirectory, 'tsconfig.json'),
+          tslint: path.join(rootDirectory, 'tslint.json'),
+        })
+      )
+    } else {
       plugins = plugins.concat(
         [
           new MiniCssExtractPlugin({
             filename: '[name].css',
             chunkFilename: '[id].css',
           }),
-          new webpack.optimize.ModuleConcatenationPlugin(),
-          new webpack.optimize.AggressiveMergingPlugin(),
           new HtmlWebpackPlugin({
             template: config.htmlTemplatePath,
             filename: config.htmlFilename,
-          })
+          }),
+          // 复制静态资源
+          new CopyWebpackPlugin([{
+            from: config.publicFilesDirectory,
+            to: config.staticDirectory,
+          }])
         ]
+      )
+    }
+  } else {
+    if (isDev) {
+      plugins.push(
+        // 复制静态资源
+        new CopyWebpackPlugin([{
+          from: config.publicFilesDirectory,
+          to: config.buildDirectory,
+        }])
       )
     }
   }
@@ -159,7 +174,7 @@ function getBundlePlugins(
   return plugins
 }
 
-function getOutputDirectoty(config: Configuration, isDev:boolean, isServer: boolean) {
+function getOutputDirectory(config: Configuration, isDev:boolean, isServer: boolean) {
   if (isDev || isServer) {
     return config.buildDirectory
   }
@@ -199,7 +214,7 @@ function getSassLoaders(isServer: boolean, isDev: boolean) {
 
 function getEnvConfig(rootDirectory: string, isDev): { [n: string]: string } {
   const envFiles = ['.env', `.env.${isDev ? 'development' : 'production'}`]
-  const config = envFiles.reduce((config, filename) => {
+  return envFiles.reduce((config, filename) => {
     if (existsSync(filename)) {
       const content = readFileSync(join(rootDirectory, filename), 'utf-8')
       content.split('\n').forEach(line => {
@@ -211,5 +226,4 @@ function getEnvConfig(rootDirectory: string, isDev): { [n: string]: string } {
     }
     return config
   }, {})
-  return config
 }

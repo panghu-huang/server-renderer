@@ -18,6 +18,7 @@ export interface Configuration {
   htmlTemplatePath: string
   buildDirName: string
   staticDirName: string
+  publicFilesDirectory: string
   buildDirectory: string
   staticDirectory: string
   htmlFilename: string
@@ -27,7 +28,7 @@ export interface Configuration {
 }
 
 type CustomMerge = (
-  config: webpack.Configuration, 
+  config: webpack.Configuration,
   opts: GenerateWebpackOpts
 ) => webpack.Configuration
 
@@ -43,6 +44,7 @@ export function getConfig(): Configuration {
   const buildDirName = 'build'
   const srcDirectory = join(rootDirectory, 'src')
   return {
+    publicFilesDirectory: join(rootDirectory, 'public'),
     htmlFilename,
     buildDirName,
     staticDirName,

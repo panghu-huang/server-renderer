@@ -47,9 +47,7 @@ class Server {
     const app = new Koa()
     const router = new KoaRouter()
     const port = config.serverPort
-    if (!isDev) {
-      app.use(this.serveFiles)
-    }
+    app.use(this.serveFiles)
     router.get('*', this.handleRequest.bind(this))
     app.use(router.routes())
     app.listen(port, () => {
@@ -71,7 +69,7 @@ class Server {
     )
     const content = renderToString(
       <Router location={fullUrl}>
-          <Container 
+          <Container
             location={fullUrl}
             App={App}
             Error={Error}
@@ -85,13 +83,15 @@ class Server {
 
   private async serveFiles(ctx: Koa.ParameterizedContext, next: () => Promise<void>) {
     const staticDirName = config.staticDirName
-    const staticDirectory = config.staticDirectory
+    const publicFilesDirectory = isDev
+      ? config.buildDirectory
+      : config.staticDirectory
     const path = ctx.path
     if (path.startsWith(`/${staticDirName}/`)) {
       await send(
         ctx,
         path.replace(`/${staticDirName}/`, ''),
-        { root: staticDirectory }
+        { root: publicFilesDirectory }
       )
     } else {
       await next()
@@ -121,12 +121,11 @@ class Server {
     url: string
   ): Promise<object> {
     if (matchedRoute && AppContainer.getInitialProps) {
-      const pageProps = await AppContainer.getInitialProps({
+      return await AppContainer.getInitialProps({
         Component: matchedRoute.component,
         url,
         ctx,
       })
-      return pageProps
     }
     return {}
   }
