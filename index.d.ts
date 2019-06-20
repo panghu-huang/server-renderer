@@ -66,7 +66,7 @@ export interface Params {
 
 export const Link: React.FunctionComponent<LinkProps>
 
-export class router {
+export class history {
   public static push(path: string, state?: any): void
   public static replace(path: string, state?: any): void
   public static go(n: number): void

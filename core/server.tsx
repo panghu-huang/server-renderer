@@ -3,7 +3,7 @@ import * as Koa from 'koa'
 import * as KoaRouter from 'koa-router'
 import * as cheerio from 'cheerio'
 import { readFileSync } from 'fs'
-import { URL } from 'url'
+import { URL, parse as parseUrl } from 'url'
 import { renderToString } from 'react-dom/server'
 import { RouterContext } from './RouterContext'
 import { history } from './history'
@@ -60,7 +60,8 @@ class Server {
     const url = ctx.url
     const fullUrl = ctx.origin + url
     const matchedRoute = routes.find(route => {
-      return path2Regexp(route.path, [], { strict: true }).test(url)
+      const p = parseUrl(url).pathname
+      return path2Regexp(route.path, [], { strict: true }).test(p)
     })
     const App = this.App
     const Error = this.Error
@@ -69,14 +70,14 @@ class Server {
     )
     const content = renderToString(
       <Router location={fullUrl}>
-          <Container
-            location={fullUrl}
-            App={App}
-            Error={Error}
-            pageProps={pageProps}
-            routes={routes}
-          />
-        </Router>
+        <Container
+          location={fullUrl}
+          App={App}
+          Error={Error}
+          pageProps={pageProps}
+          routes={routes}
+        />
+      </Router>
     )
     ctx.body = this.renderHTML(content, pageProps)
   }
@@ -99,7 +100,9 @@ class Server {
   }
 
   private renderHTML(content: string, pageProps: object) {
-    const $ = cheerio.load(this.originalHTML, { decodeEntities: true })
+    const $ = cheerio.load(this.originalHTML, { 
+      decodeEntities: true,
+    })
     $(this.container).html(content)
     $('head').append(`
       <script type='text/javascript'>

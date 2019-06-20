@@ -1,6 +1,6 @@
 {
   "name": "server-renderer",
-  "version": "0.2.15",
+  "version": "0.3.1",
   "main": "lib/index.js",
   "typings": "./index.d.ts",
   "license": "MIT",
