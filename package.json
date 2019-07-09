@@ -1,6 +1,6 @@
 {
   "name": "server-renderer",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "main": "lib/index.js",
   "typings": "./index.d.ts",
   "license": "MIT",
@@ -62,8 +62,8 @@
     "jest": "^24.7.1",
     "react": "^16.8.5",
     "react-dom": "^16.8.5",
-    "rollup": "^1.6.0",
-    "rollup-plugin-typescript": "^1.0.0",
+    "rollup": "^1.16.6",
+    "rollup-plugin-typescript": "^1.0.1",
     "rollup-plugin-uglify": "^6.0.2",
     "taskr": "^1.1.0",
     "ts-jest": "^24.0.2",

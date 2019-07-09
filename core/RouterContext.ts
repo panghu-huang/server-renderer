@@ -11,3 +11,5 @@ const routerStore: RouterStore = {
 }
 
 export const RouterContext = createContext(routerStore)
+
+RouterContext.displayName = 'RouterContext'

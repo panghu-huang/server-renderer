@@ -1,8 +1,10 @@
 import * as React from 'react'
+import * as _path2Regexp from 'path-to-regexp'
 import { RouterContext } from './RouterContext'
 import { history } from './history'
 import { LinkProps } from 'index.d'
-import path2Regexp from 'path-to-regexp'
+
+const path2Regexp = _path2Regexp
 
 const Link: React.FunctionComponent<LinkProps> = ({
   className, activeClassName, to, onClick, ...restProps

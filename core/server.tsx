@@ -2,13 +2,13 @@ import * as React from 'react'
 import * as Koa from 'koa'
 import * as KoaRouter from 'koa-router'
 import * as cheerio from 'cheerio'
+import * as _path2Regexp from 'path-to-regexp'
 import { readFileSync } from 'fs'
 import { URL, parse as parseUrl } from 'url'
 import { renderToString } from 'react-dom/server'
 import { RouterContext } from './RouterContext'
 import { history } from './history'
 import { getConfig } from 'scripts/config'
-import path2Regexp from 'path-to-regexp'
 import send from 'koa-send'
 import DefaultApp from './DefaultApp'
 import Router from './Router'
@@ -17,6 +17,7 @@ import Link from './Link'
 import Error from './Error'
 
 import ServerRenderer = require('index.d')
+const path2Regexp = _path2Regexp
 
 const config = getConfig()
 const isDev = process.env.NODE_ENV === 'development'

@@ -7,6 +7,6 @@ export default {
   output: {
     file: resolve('lib/index.js'),
     format: 'umd',
-    name: 'it-ssr',
+    name: 'ServerRenderer',
   },
 }
