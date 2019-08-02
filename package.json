@@ -1,9 +1,14 @@
 {
   "name": "server-renderer",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "main": "lib/index.js",
   "typings": "./index.d.ts",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wokeyi/server-renderer.git"
+  },
+  "homepage": "https://github.com/wokeyi/server-renderer",
   "bin": {
     "server-renderer": "./lib/scripts/server-renderer.js"
   },
@@ -22,6 +27,7 @@
   "dependencies": {
     "@types/history": "^4.7.2",
     "@types/koa": "^2.0.48",
+    "@types/react": "^16.8.23",
     "chalk": "^2.4.2",
     "cheerio": "^1.0.0-rc.2",
     "commander": "^2.19.0",
@@ -71,7 +77,7 @@
     "typescript": "^3.3.3333"
   },
   "peerDependencies": {
-    "react": "~16.8.0",
-    "react-dom": "~16.8.0"
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
   }
 }

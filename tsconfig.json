@@ -6,5 +6,12 @@
     "target": "es6",
     "jsx": "react",
     "allowSyntheticDefaultImports": true
-  }
+  },
+  "include": [
+    "core",
+    "config",
+    "__tests__",
+    "scripts",
+    "index.d.ts"
+  ]
 }
