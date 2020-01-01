@@ -1,0 +1,97 @@
+{
+  "name": "server-renderer",
+  "version": "0.4.9-alpha",
+  "description": "library of server side render for React",
+  "main": "lib/index.js",
+  "bin": {
+    "server-renderer": "./lib/scripts/server-renderer.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wokeyi/server-renderer.git"
+  },
+  "keywords": [
+    "React",
+    "Server side render",
+    "server-renderer",
+    "Node"
+  ],
+  "homepage": "https://github.com/wokeyi/server-renderer",
+  "author": "wokeyi",
+  "license": "MIT",
+  "private": false,
+  "files": [
+    "src",
+    "lib",
+    "index.d.ts"
+  ],
+  "scripts": {
+    "build:script": "tsc --build tsconfig-scripts.json --pretty",
+    "build:lib": "node ./lib/scripts/rollup.js",
+    "build": "npm-run-all build:*"
+  },
+  "dependencies": {
+    "@babel/core": "^7.7.7",
+    "@babel/plugin-proposal-class-properties": "^7.7.4",
+    "@babel/plugin-transform-runtime": "^7.7.6",
+    "@babel/preset-env": "^7.7.7",
+    "@babel/preset-react": "^7.7.4",
+    "@babel/preset-typescript": "^7.7.7",
+    "@rollup/plugin-typescript": "^2.0.1",
+    "@types/cheerio": "^0.22.15",
+    "@types/history": "^4.7.3",
+    "@types/mini-css-extract-plugin": "^0.9.0",
+    "@types/node": "^12.12.21",
+    "@types/path-to-regexp": "^1.7.0",
+    "@types/react": "^16.9.17",
+    "@types/react-dom": "^16.9.4",
+    "@types/webpack": "^4.41.0",
+    "@types/webpack-node-externals": "^1.7.0",
+    "babel-loader": "^8.0.6",
+    "chalk": "^3.0.0",
+    "cheerio": "^1.0.0-rc.3",
+    "commander": "^4.0.1",
+    "css-loader": "^3.4.0",
+    "history": "^4.10.1",
+    "html-webpack-inline-source-plugin": "^0.0.10",
+    "html-webpack-plugin": "^3.2.0",
+    "isomorphic-style-loader": "^5.1.0",
+    "mini-css-extract-plugin": "^0.9.0",
+    "node-sass": "^4.13.0",
+    "npm-run-all": "^4.1.5",
+    "optimize-css-assets-webpack-plugin": "^5.0.3",
+    "path-to-regexp": "^6.1.0",
+    "postcss": "^7.0.25",
+    "postcss-flexbugs-fixes": "^4.1.0",
+    "postcss-loader": "^3.0.0",
+    "postcss-preset-env": "^6.7.0",
+    "react-dev-utils": "^10.0.0",
+    "rollup": "^1.27.13",
+    "rollup-plugin-uglify": "^6.0.4",
+    "sass-loader": "^8.0.0",
+    "scss-loader": "^0.0.1",
+    "style-loader": "^1.1.1",
+    "terser-webpack-plugin": "^2.3.1",
+    "ts-loader": "^6.2.1",
+    "tslib": "^1.10.0",
+    "typescript": "^3.7.4",
+    "webpack": "^4.41.4",
+    "webpack-merge": "^4.2.2",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "peerDependencies": {
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0"
+  },
+  "devDependencies": {
+    "@types/chalk": "^2.2.0",
+    "@types/commander": "^2.12.2",
+    "@types/html-webpack-plugin": "^3.2.1",
+    "@types/optimize-css-assets-webpack-plugin": "^5.0.1",
+    "@types/react-dev-utils": "^9.0.2",
+    "@types/terser-webpack-plugin": "^2.2.0",
+    "@types/webpack-merge": "^4.1.5",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0"
+  }
+}

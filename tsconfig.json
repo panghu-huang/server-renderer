@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "rootDir": ".",
+    "outDir": "lib",
+    "allowJs": true,
+    "checkJs": false,
+    "allowSyntheticDefaultImports": true,
+    "alwaysStrict": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "importHelpers": true,
+    "noUnusedLocals": true,
+    "strictNullChecks": true,
+    "strict": true,
+    "lib": ["es6", "dom"],
+    "jsx": "react",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "target": "es6"
+  },
+  "include": [
+    "src",
+    "config",
+    "scripts"
+  ]
+}
