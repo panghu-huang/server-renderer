@@ -1,30 +1,15 @@
 import * as http from 'http'
-import * as path from 'path'
 import * as types from 'src/types'
-import { createReadStream, existsSync } from 'fs'
 import { getConfig } from 'config/config'
 import { renderToString } from './renderToString'
+import { sendStaticFile } from './static'
 
 const config = getConfig()
 
 function createServer(options: types.RenderOptions) {
   const app = http.createServer(async (req, res) => {
     if (req.url?.startsWith(config.publicPath)) {
-      const filePath = path.join(
-        config.distDir,
-        'client',
-        req.url.replace(config.publicPath, '')
-      )
-      if (existsSync(filePath)) {
-        const stream = createReadStream(filePath)
-        stream.pipe(res)
-        stream.on('close', () => {
-          res.end()
-        })
-      } else {
-        res.statusCode = 404
-        res.end()
-      }
+      sendStaticFile(req, res)
     } else {
       const html = await renderToString(req.url || '/', options)
       res.end(html)

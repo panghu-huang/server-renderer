@@ -20,7 +20,7 @@ export function createWebpackConfig(isServer: boolean): webpack.Configuration {
 
   const webpackConfig: webpack.Configuration = {
     bail: true,
-    mode: (config.isDev || isServer) ? 'development' : 'production',
+    mode: config.isDev ? 'development' : 'production',
     // only client and in development mode
     devtool: (config.isDev && !isServer) ? 'cheap-module-source-map' : false,
     stats: 'errors-warnings',
@@ -46,7 +46,36 @@ export function createWebpackConfig(isServer: boolean): webpack.Configuration {
     },
     module: {
       rules: [
-        getTsLoader(isServer, config),
+        {
+          test: /\.(t|j)sx?$/,
+          include: resolveAppPath('src'),
+          loader: require.resolve('babel-loader'),
+          options: {
+            plugins: [
+              require.resolve('@babel/plugin-proposal-class-properties'),
+              [
+                require.resolve('@babel/plugin-transform-runtime'),
+                {
+                  helpers: true,
+                  regenerator: true,
+                  useESModules: false
+                }
+              ]
+            ],
+            presets: [
+              require.resolve('@babel/preset-react'),
+              require.resolve('@babel/preset-env'),
+              [
+                require.resolve('@babel/preset-typescript'),
+                {
+                  isTSX: true,
+                  allExtensions: true,
+                  allowNamespaces: false,
+                }
+              ],
+            ],
+          }
+        },
         {
           test: /\.s?css$/,
           oneOf: [
@@ -152,7 +181,7 @@ function getOptimization(isServer: boolean, config: Config): webpack.Options.Opt
 
 function getStyleLoaders(isServer: boolean, isModule: boolean, config: Config): webpack.RuleSetUse {
   const useSourceMap = !isServer && !config.isDev
-  const cssLoaderWithModule = {
+  const cssLoader = {
     loader: require.resolve('css-loader'),
     options: {
       importLoaders: 1,
@@ -173,7 +202,7 @@ function getStyleLoaders(isServer: boolean, isModule: boolean, config: Config): 
 
   const loaders: webpack.RuleSetUse = [
     styleLoader,
-    cssLoaderWithModule,
+    cssLoader,
   ]
 
   if (!isServer && !config.isDev) {
@@ -202,48 +231,4 @@ function getStyleLoaders(isServer: boolean, isModule: boolean, config: Config): 
     }
   })
   return loaders
-}
-
-function getTsLoader(isServer: boolean, config: Config): webpack.RuleSetRule {
-  const srcDir = path.resolve(config.rootDir, 'src')
-  if (isServer) {
-    return {
-      test: /\.(t|j)sx?$/,
-      include: srcDir,
-      loader: require.resolve('ts-loader'),
-      options: {
-        transpileOnly: true,
-      }
-    }
-  }
-  return {
-    test: /\.(t|j)sx?$/,
-    include: srcDir,
-    loader: require.resolve('babel-loader'),
-    options: {
-      plugins: [
-        require.resolve('@babel/plugin-proposal-class-properties'),
-        [
-          require.resolve('@babel/plugin-transform-runtime'),
-          {
-            helpers: true,
-            regenerator: true,
-            useESModules: false
-          }
-        ]
-      ],
-      presets: [
-        require.resolve('@babel/preset-react'),
-        require.resolve('@babel/preset-env'),
-        [
-          require.resolve('@babel/preset-typescript'),
-          {
-            isTSX: true,
-            allExtensions: true,
-            allowNamespaces: false,
-          }
-        ],
-      ],
-    }
-  }
 }
