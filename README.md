@@ -1,5 +1,8 @@
 # ServerRenderer@Alpha
 
+### DEMO
+[https://github.com/wokeyi/games-club](https://github.com/wokeyi/games-club)
+
 ### 安装
 ```bash
 $ yarn add react react-dom server-renderer@alpha
