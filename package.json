@@ -1,6 +1,6 @@
 {
   "name": "server-renderer",
-  "version": "0.5.0-alpha",
+  "version": "0.5.1-alpha",
   "description": "library of server side render for React",
   "main": "lib/index.js",
   "bin": {

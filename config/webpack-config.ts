@@ -1,4 +1,5 @@
 import path from 'path'
+import fs from 'fs'
 import webpack from 'webpack'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import HTMLWebpackPlugin from 'html-webpack-plugin'
@@ -22,7 +23,7 @@ export function createWebpackConfig(isServer: boolean): webpack.Configuration {
     bail: true,
     mode: config.isDev ? 'development' : 'production',
     // only client and in development mode
-    devtool: (config.isDev && !isServer) ? 'cheap-module-source-map' : false,
+    devtool: (config.isDev && !isServer) ? 'cheap-module-eval-source-map' : false,
     stats: 'errors-warnings',
     target: isServer ? 'node' : 'web',
     entry: {
@@ -123,7 +124,11 @@ function mergeConfig(
 }
 
 function getPlugins(isServer: boolean, config: Config): webpack.Plugin[] {
-  const plugins: webpack.Plugin[] = []
+  const envVariables = getEnvVariables(config)
+
+  const plugins: webpack.Plugin[] = [
+    new webpack.DefinePlugin(envVariables)
+  ]
 
   if (!isServer && !config.isDev) {
     plugins.push(
@@ -231,4 +236,40 @@ function getStyleLoaders(isServer: boolean, isModule: boolean, config: Config): 
     }
   })
   return loaders
+}
+
+function getEnvVariables(config: Config) {
+  const filename = `.env.${process.env.NODE_ENV}.local`
+  const fullPath = path.join(config.rootDir, filename)
+  const lines = []
+  if (fs.existsSync(fullPath)) {
+    const fileContent = fs.readFileSync(fullPath, 'utf-8')
+    // 从 .env.xxx.local 文件读取变量
+    lines.push(
+      ...fileContent.split('\n')
+    )
+  }
+
+  // 过滤 process.env
+  Object.keys(process.env).forEach(key => {
+    if (key.includes('APP_')) {
+      lines.push(`${key}=${process.env[key]}`)
+    }
+  })
+
+  // 过滤 .env.xxx.local
+  const variables = lines.reduce((variables, line) => {
+    const [key, value] = line.split('=')
+    if (key.includes('APP_')) {
+      variables[key] = value
+    }
+    return variables
+  }, { NODE_ENV: process.env.NODE_ENV } as Record<string, string>)
+
+  return {
+    'process.env': Object.keys(variables).reduce((env, key) => {
+      env[key] = JSON.stringify(variables[key])
+      return env
+    }, {} as Record<string, string>)
+  }
 }
