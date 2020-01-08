@@ -14,7 +14,7 @@ export interface Config {
   cleanConsoleOnRebuild: boolean
   decodeEntities: boolean
   configureWebpack?: webpack.Configuration 
-    | ((isServer: boolean, webpackConfig: webpack.Configuration, config: Config) => webpack.Configuration)
+    | ((webpackConfig: webpack.Configuration, isServer: boolean, config: Config) => webpack.Configuration)
 }
 
 export const getConfig = (): Config => {
@@ -28,7 +28,7 @@ export const getConfig = (): Config => {
     distDir: path.join(rootDir, 'dist'),
     builtHTMLPath: path.join(rootDir, 'dist/client/index.html'),
     serverEntry: path.resolve(rootDir, 'src/index.tsx'),
-    publicPath: '/public',
+    publicPath: '/public/',
     cleanConsoleOnRebuild: true,
     decodeEntities: false,
   }
@@ -39,6 +39,7 @@ export const getConfig = (): Config => {
     return {
       ...defaultConfig,
       ...customConfig,
+      rootDir,
     }
   }
 

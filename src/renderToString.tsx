@@ -35,8 +35,9 @@ function writeDataToHTML($: CheerioStatic, pageProps: object) {
 
 function appendScriptOnDevelop($: CheerioStatic) {
   if (config.isDev) {
+    const scriptUrl = config.publicPath + 'app.js'
     $('body').append(`
-      <script type="text/javascript" src="${config.publicPath}/app.js"></script>
+      <script type="text/javascript" src="${scriptUrl}"></script>
     `)
   }
 }

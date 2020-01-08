@@ -114,7 +114,7 @@ function mergeConfig(
 ): webpack.Configuration {
   if (config.configureWebpack) {
     if (typeof config.configureWebpack === 'function') {
-      return config.configureWebpack(isServer, webpackConfig, config)
+      return config.configureWebpack(webpackConfig, isServer, config)
     }
 
     return webpackMerge(webpackConfig, config.configureWebpack)

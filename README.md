@@ -116,7 +116,7 @@ export interface Config {
   decodeEntities: boolean
   // 自定义 Webpack 配置
   configureWebpack?: webpack.Configuration 
-    | ((isServer: boolean, webpackConfig: webpack.Configuration, config: Config) => webpack.Configuration)
+    | ((webpackConfig: webpack.Configuration, isServer: boolean, config: Config) => webpack.Configuration)
 }
 ```
 
