@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import chalk from 'chalk'
 
 export function deleteDir(directory: string) {
   if (directory && fs.existsSync(directory)) {
@@ -39,4 +40,12 @@ export function copyDir(source: string, dest: string) {
       })
     }
   }
+}
+
+export function logError(msg: string) {
+  console.log(chalk.red(msg))
+}
+
+export function logSuccess(msg: string) {
+  console.log(chalk.green(msg))
 }

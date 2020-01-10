@@ -9,6 +9,7 @@ import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin'
 import HTMLWebpackInlineSourcePlugin from 'html-webpack-inline-source-plugin'
 import nodeExternals from 'webpack-node-externals'
 import webpackMerge from 'webpack-merge'
+import ora from 'ora'
 import { getConfig, Config } from './config'
 
 export function createWebpackConfig(isServer: boolean): webpack.Configuration {
@@ -123,12 +124,31 @@ function mergeConfig(
   return webpackConfig
 }
 
+function getProgressPlugin() {
+  const spinner = ora()
+  return new webpack.ProgressPlugin((percentage: number, msg: string) => {
+    if (!spinner.isSpinning) {
+      spinner.start()
+    }
+    spinner.text = `${(percentage * 100).toFixed(2)}% ${msg}`
+    if (percentage === 1) {
+      spinner.stop()
+    }
+  })
+}
+
 function getPlugins(isServer: boolean, config: Config): webpack.Plugin[] {
   const envVariables = getEnvVariables(config)
 
   const plugins: webpack.Plugin[] = [
     new webpack.DefinePlugin(envVariables)
   ]
+
+  if (isServer || !config.isDev) {
+    plugins.push(
+      getProgressPlugin()
+    )
+  }
 
   if (!isServer && !config.isDev) {
     plugins.push(

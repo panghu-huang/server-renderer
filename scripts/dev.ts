@@ -3,7 +3,7 @@ import path from 'path'
 import fs from 'fs'
 import chalk from 'chalk'
 import { ChildProcess, fork } from 'child_process'
-import { deleteDir, copyDir } from './utils'
+import { deleteDir, copyDir, logError, logSuccess } from './utils'
 import { createWebpackConfig } from '../config/webpack-config'
 import { getConfig } from '../config/config'
 
@@ -15,42 +15,60 @@ let childProcess: ChildProcess | null = null
 let chunkPath: string = ''
 let buildTime: number = 0
 let hasError = false
+let isChildProcessExited = true
 
 function createChildProcess() {
   childProcess = fork(chunkPath, [], {stdio: 'inherit'})
+  isChildProcessExited = false
+  
   childProcess.on('error', (err: Error) => {
-    console.error(err.message)
+    logError(err.message)
     process.exit(1)
   })
+
   childProcess.on('close', () => {
-    config.cleanConsoleOnRebuild && console.clear()
+    !hasError && config.cleanConsoleOnRebuild && console.clear()
+
     if (childProcess?.killed && !hasError) {
       createChildProcess()
     }
   })
-  console.log(
-    chalk.green(`Compiled successfully! Done in ${(buildTime / 1000).toFixed(2)}s`)
-  )
+
+  childProcess.on('exit', () => {
+    isChildProcessExited = true
+  })
+
+  !hasError && logSuccess(`Compiled successfully! Done in ${(buildTime / 1000).toFixed(2)}s`)
 }
 
 function runCompile(configs: webpack.Configuration[]) {
   const compiler = webpack(configs) as webpack.MultiCompiler
-  compiler.hooks.watchRun.tap('ssr-watch-run', () => {
+
+  compiler.hooks.watchRun.tap('server-renderer', compiler => {
+    const isClient = path.basename(compiler.outputPath) === 'client'
+
+    if (isClient) {
+      return
+    }
     config.cleanConsoleOnRebuild && console.clear()
-    console.log(
-      chalk.green(`Compiling...`)
-    )
+    logSuccess('compiling...')
   })
-  compiler.watch(
-    {ignored: /node_modules/},
-    (err: Error, stats: any) => {
+
+  compiler.watch({ignored: /node_modules/}, (err: Error, stats: any) => {
       if (err) {
+        logError(err.message)
         hasError = true
         childProcess?.kill(1)
-        throw err
+        return
       }
       const [serverStats] = (stats as webpack.compilation.MultiStats).stats
       const {errors, warnings, outputPath, assetsByChunkName, time} = serverStats.toJson()
+
+      // [app.js, app.js.map] or app.js
+      const assets = assetsByChunkName?.app
+      if (!assets || outputPath && path.basename(outputPath) === 'client') {
+        return
+      }
 
       if (warnings.length) {
         console.log(
@@ -63,29 +81,17 @@ function runCompile(configs: webpack.Configuration[]) {
         })
       }
       if (errors.length) {
-        console.log(
-          chalk.redBright('Compiled with errors')
-        )
-        errors.forEach(error => {
-          console.log(
-            chalk.redBright(error)
-          )
-        })
+        logError('Compiled with errors')
+        errors.forEach(logError)
         hasError = true
-        childProcess?.kill(1)
-        process.exit(1)
+      } else {
+        hasError = false
       }
-
-      hasError = false
-
-      // [app.js, app.js.map] or app.js
-      const assets = assetsByChunkName?.app
-      if (!assets || outputPath && path.basename(outputPath) === 'client') {
-        return
-      }
+      
       chunkPath = path.join(outputPath as string, Array.isArray(assets) ? assets[0] : assets)
       buildTime = time as number
-      if (childProcess) {
+      
+      if (childProcess && !isChildProcessExited) {
         childProcess.kill()
       } else {
         createChildProcess()
