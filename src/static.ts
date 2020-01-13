@@ -1,21 +1,25 @@
 import { join } from 'path'
 import { IncomingMessage, ServerResponse } from 'http'
 import { getType as getContentType } from 'mime'
-import { createReadStream, existsSync, statSync } from 'fs'
+import { createReadStream, exists, stat } from 'fs'
+import { promisify } from 'util'
 import { getConfig } from 'config/config'
 
 const config = getConfig()
+const existsAsync = promisify(exists)
+const statAsync = promisify(stat)
 
-export function sendStaticFile(req: IncomingMessage, res: ServerResponse) {
+export async function sendStaticFile(req: IncomingMessage, res: ServerResponse) {
   const filePath = join(
     config.distDir,
     'client',
     (req.url as string).replace(config.publicPath, '')
   )
-  if (existsSync(filePath)) {
+  const isExists = await existsAsync(filePath)
+  if (isExists) {
     if (!config.isDev) {
-      const time = statSync(filePath).mtime
-      const lastModified = new Date(time).toUTCString()
+      const stats = await statAsync(filePath)
+      const lastModified = new Date(stats.mtime).toUTCString()
       res.setHeader('Last-Modified', lastModified)
       res.setHeader('Cache-Control', 'public')
 

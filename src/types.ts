@@ -7,12 +7,12 @@ export interface RenderOptions {
 }
 
 export interface Route {
-  path: string
+  path: string | '*'
   component: ComponentType<any>
 }
 
 export interface AppProps {
-  Component?: ComponentType<any>
+  Component: ComponentType<any> | null
   [propName: string]: any
 }
 

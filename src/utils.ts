@@ -4,10 +4,22 @@ import { parse as parseUrl } from 'url'
 import { pathToRegexp } from 'path-to-regexp'
 
 export function findMatchedRoute(url: string, routes: types.Route[] = []) {
+  // 通配符
+  const wildcard = '(.*)'
   const { pathname } = parseUrl(url)
-  const matched = routes.find(route => {
-    return pathToRegexp(route.path).test(pathname + '')
-  })
+  const matched = routes
+    .map(route => {
+      if (route.path === '*') {
+        return {
+          ...route,
+          path: wildcard,
+        }
+      }
+      return route
+    })
+    .find(route => {
+      return pathToRegexp(route.path).test(pathname + '')
+    })
 
   return matched
 }
