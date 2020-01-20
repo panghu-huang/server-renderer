@@ -2,6 +2,7 @@ import * as React from 'react'
 import * as fs from 'fs'
 import * as cheerio from 'cheerio'
 import * as types from 'src/types'
+import { IncomingMessage, ServerResponse } from 'http'
 import { getConfig } from 'config/config'
 import { findMatchedRoute, callGetInitialProps } from 'src/utils'
 import ReactDOMServer from 'react-dom/server'
@@ -42,7 +43,12 @@ function appendScriptOnDevelop($: CheerioStatic) {
   }
 }
 
-export async function renderToString(url: string, options: types.RenderOptions): Promise<string> {
+export async function renderToString(
+  req: IncomingMessage,
+  res: ServerResponse,
+  url: string, 
+  options: types.RenderOptions,
+): Promise<string> {
   const $ = cheerio.load(template, {
     decodeEntities: config.decodeEntities,
   })
@@ -50,8 +56,10 @@ export async function renderToString(url: string, options: types.RenderOptions):
   const App = options.App || DefaultApp
   const initialProps = await callGetInitialProps(
     App,
-    matched && matched.component,
+    matched ? matched.component : null,
     url,
+    req,
+    res,
   )
   const content = ReactDOMServer.renderToString(
     <Root

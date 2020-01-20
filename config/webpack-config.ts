@@ -7,6 +7,8 @@ import TerserWebpackPlugin from 'terser-webpack-plugin'
 import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin'
 // @ts-ignore
 import HTMLWebpackInlineSourcePlugin from 'html-webpack-inline-source-plugin'
+// @ts-ignore
+import safePostCSSParser from 'postcss-safe-parser'
 import nodeExternals from 'webpack-node-externals'
 import webpackMerge from 'webpack-merge'
 import ora from 'ora'
@@ -185,7 +187,15 @@ function getOptimization(isServer: boolean, config: Config): webpack.Options.Opt
           }
         }
       }),
-      new OptimizeCSSAssetsPlugin(),
+      new OptimizeCSSAssetsPlugin({
+        cssProcessorOptions: {
+          parser: safePostCSSParser,
+          map: {
+            inline: false,
+            annotation: true,
+          },
+        },
+      }),
     ],
     splitChunks: {
       chunks: 'all',
@@ -261,30 +271,24 @@ function getStyleLoaders(isServer: boolean, isModule: boolean, config: Config): 
 function getEnvVariables(config: Config) {
   const filename = `.env.${process.env.NODE_ENV}.local`
   const fullPath = path.join(config.rootDir, filename)
-  const lines = []
   if (fs.existsSync(fullPath)) {
     const fileContent = fs.readFileSync(fullPath, 'utf-8')
-    // 从 .env.xxx.local 文件读取变量
-    lines.push(
-      ...fileContent.split('\n')
-    )
+    fileContent.split('\n').forEach(line => {
+      if (!line.includes('=')) {
+        return
+      }
+      const [key, value] = line.split('=')
+      process.env[key] = value
+    })
   }
 
-  // 过滤 process.env
-  Object.keys(process.env).forEach(key => {
-    if (key.includes('APP_')) {
-      lines.push(`${key}=${process.env[key]}`)
-    }
-  })
-
-  // 过滤 .env.xxx.local
-  const variables = lines.reduce((variables, line) => {
-    const [key, value] = line.split('=')
-    if (key.includes('APP_')) {
-      variables[key] = value
-    }
-    return variables
-  }, { NODE_ENV: process.env.NODE_ENV } as Record<string, string>)
+  const variables = Object.keys(process.env)
+    .reduce((variables, envKey) => {
+      if (envKey.includes('APP_')) {
+        variables[envKey] = process.env[envKey] as string
+      }
+      return variables
+    }, { NODE_ENV: process.env.NODE_ENV } as Record<string, string>)
 
   return {
     'process.env': Object.keys(variables).reduce((env, key) => {

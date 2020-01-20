@@ -90,7 +90,7 @@ export const Router: React.FC<types.RouterProps> = props => {
   return (
     <RouterContext.Provider value={store}>
       <props.App 
-        {...pageProps.current}
+        pageProps={pageProps.current}
         Component={component.current}
       />
     </RouterContext.Provider>

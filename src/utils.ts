@@ -1,5 +1,6 @@
 import * as types from 'src/types'
 import { ComponentType } from 'react'
+import { IncomingMessage, ServerResponse } from 'http'
 import { parse as parseUrl } from 'url'
 import { pathToRegexp } from 'path-to-regexp'
 
@@ -26,11 +27,19 @@ export function findMatchedRoute(url: string, routes: types.Route[] = []) {
 
 export async function callGetInitialProps(
   App: types.AppComponentType,
-  Component: ComponentType<any> | undefined,
+  Component: ComponentType<any> | null,
   url: string,
+  req?: IncomingMessage,
+  res?: ServerResponse,
 ) {
   if (App.getInitialProps) {
-    return await App.getInitialProps({ Component, url })
+    const params: types.GetInitialPropsParams = {
+      Component,
+      url,
+      req,
+      res,
+    }
+    return await App.getInitialProps(params)
   }
   return {}
 }

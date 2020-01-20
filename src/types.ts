@@ -1,4 +1,5 @@
 import { ComponentType, default as React } from 'react'
+import { IncomingMessage, ServerResponse } from 'http'
 
 export interface RenderOptions {
   container: string
@@ -11,9 +12,9 @@ export interface Route {
   component: ComponentType<any>
 }
 
-export interface AppProps {
+export interface AppProps<PageProps = any> {
   Component: ComponentType<any> | null
-  [propName: string]: any
+  pageProps: PageProps
 }
 
 export interface RouterProps {
@@ -27,6 +28,8 @@ export interface RouterProps {
 export interface GetInitialPropsParams {
   Component: ComponentType<any> | null
   url: string
+  res?: ServerResponse
+  req?: IncomingMessage
 }
 
 export interface LinkProps extends React.HTMLAttributes<HTMLAnchorElement> {

@@ -11,7 +11,12 @@ function createServer(options: types.RenderOptions) {
     if (req.url?.startsWith(config.publicPath)) {
       sendStaticFile(req, res)
     } else {
-      const html = await renderToString(req.url || '/', options)
+      const html = await renderToString(
+        req,
+        res,
+        req.url || '/', 
+        options
+      )
       res.end(html)
     }
   })

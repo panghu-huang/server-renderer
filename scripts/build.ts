@@ -16,8 +16,9 @@ async function runCompile(webpackConfig: webpack.Configuration, isClient = false
     webpack(webpackConfig).run(((err, stats) => {
       if (err) {
         console.log(
-          chalk.redBright(err.message)
+          chalk.redBright(err.message + '\n')
         )
+        console.log(err + '\n')
         reject()
         return
       }
