@@ -47,6 +47,8 @@ export interface GetInitialPropsParams {
   Component: ComponentType<any> | null
   // 访问路径
   url: string
+  res?: ServerResponse
+  req?: IncomingMessage
 }
 ```
 调用 App.getInitialProps 时会默认传入 `GetInitialPropsParams` 结构的数据
@@ -123,7 +125,7 @@ export interface Config {
 * renderToString
 
 ```javascript
-export function renderToString(url: string, options: RenderOptions): Promise<string>
+export function renderToString(req: IncomingMessage, res: ServerResponse, url: string, options: RenderOptions): Promise<string>
 ```
 提供一个 renderToString 方法，可以更方便的自定义服务端的内容，如：
 ```javascript
@@ -136,7 +138,7 @@ const app = express()
 const router = express.Router()
 
 router.get('*', async (req, res) => {
-  const html = await renderToString(req.url, {
+  const html = await renderToString(req, res, req.url, {
     container: '#root',
     App,
   })
