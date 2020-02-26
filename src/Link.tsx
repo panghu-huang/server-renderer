@@ -11,6 +11,7 @@ const Link: React.FC<types.LinkProps> = ({
         onClick(evt as any)
       }
       if (!evt.isDefaultPrevented()) {
+        evt.preventDefault()
         history.push(to)
       }
     },
@@ -18,7 +19,7 @@ const Link: React.FC<types.LinkProps> = ({
   )
 
   return (
-    <a onClick={handler} {...otherProps}/>
+    <a onClick={handler} href={to} {...otherProps}/>
   )
 }
 

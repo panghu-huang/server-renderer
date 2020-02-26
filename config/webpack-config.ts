@@ -262,6 +262,9 @@ function getStyleLoaders(isServer: boolean, isModule: boolean, config: Config): 
   loaders.push({
     loader: require.resolve('sass-loader'),
     options: {
+      sassOptions: {
+        data: config.sassData,
+      },
       sourceMap: useSourceMap,
     }
   })
@@ -270,6 +273,7 @@ function getStyleLoaders(isServer: boolean, isModule: boolean, config: Config): 
 
 function getEnvVariables(config: Config) {
   const filename = `.env.${process.env.NODE_ENV}.local`
+
   const fullPath = path.join(config.rootDir, filename)
   if (fs.existsSync(fullPath)) {
     const fileContent = fs.readFileSync(fullPath, 'utf-8')
@@ -288,7 +292,7 @@ function getEnvVariables(config: Config) {
         variables[envKey] = process.env[envKey] as string
       }
       return variables
-    }, { NODE_ENV: process.env.NODE_ENV } as Record<string, string>)
+    }, { NODE_ENV: process.env.NODE_ENV, PORT: config.port } as Record<string, string | number>)
 
   return {
     'process.env': Object.keys(variables).reduce((env, key) => {

@@ -116,6 +116,8 @@ export interface Config {
   cleanConsoleOnRebuild: boolean
   // 是否对服务端直出的 HTML 做转译
   decodeEntities: boolean
+  // sass 数据（node-sass options 中的 data）
+  sassData: string | null
   // 自定义 Webpack 配置
   configureWebpack?: webpack.Configuration 
     | ((webpackConfig: webpack.Configuration, isServer: boolean, config: Config) => webpack.Configuration)

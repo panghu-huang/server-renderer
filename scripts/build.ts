@@ -1,11 +1,11 @@
 import webpack from 'webpack'
 import chalk from 'chalk'
 import path from 'path'
+import fs from 'fs'
 import FileSizeReporter from 'react-dev-utils/FileSizeReporter'
 import { createWebpackConfig } from '../config/webpack-config'
 import { getConfig } from '../config/config'
-import { copyDir, deleteDir } from './utils'
-import fs from "fs";
+import { copyDir, deleteDir, logError, logSuccess } from './utils'
 
 process.env.NODE_ENV = 'production'
 
@@ -15,10 +15,7 @@ async function runCompile(webpackConfig: webpack.Configuration, isClient = false
   return new Promise(((resolve, reject) => {
     webpack(webpackConfig).run(((err, stats) => {
       if (err) {
-        console.log(
-          chalk.redBright(err.message + '\n')
-        )
-        console.log(err + '\n')
+        logError(err.message + '\n')
         reject()
         return
       }
@@ -34,21 +31,13 @@ async function runCompile(webpackConfig: webpack.Configuration, isClient = false
         })
       }
       if (errors.length) {
-        console.log(
-          chalk.redBright('Compiled with errors')
-        )
-        errors.forEach(error => {
-          console.log(
-            chalk.redBright(error)
-          )
-        })
+        logError('Compiled with errors')
+        errors.forEach(logError)
         reject()
         return
       }
       if (isClient) {
-        console.log(
-          chalk.green('File sizes after gzip:\n')
-        )
+        logSuccess('File sizes after gzip:\n')
         FileSizeReporter.printFileSizesAfterBuild(
           stats,
           {
@@ -67,9 +56,7 @@ async function runCompile(webpackConfig: webpack.Configuration, isClient = false
 
 async function build() {
   try {
-    console.log(
-      chalk.green('Start compile...')
-    )
+    logSuccess('Start compile...')
     const clientConfig = createWebpackConfig(false)
     const serverConfig = createWebpackConfig(true)
 
@@ -84,23 +71,15 @@ async function build() {
     copyDir(publicDir, serverOutput)
     copyDir(publicDir, clientOutput)
 
-    console.log(
-      chalk.green('Start to build server bundle...')
-    )
+    logSuccess('Start to build server bundle...')
     await runCompile(serverConfig)
-    console.log(
-      chalk.green('Start to build client bundle...')
-    )
+    logSuccess('Start to build client bundle...')
     await runCompile(clientConfig, true)
 
-    console.log(
-      chalk.green('Compiled successfully.')
-    )
+    logSuccess('Compiled successfully.')
   } catch (error) {
     if (error) {
-      console.log(
-        chalk.red(error)
-      )
+      logError(error)
     }
     process.exit(1)
   }

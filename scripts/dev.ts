@@ -27,7 +27,7 @@ function createChildProcess() {
   })
 
   childProcess.on('close', () => {
-    !hasError && config.cleanConsoleOnRebuild && console.clear()
+    // !hasError && config.cleanConsoleOnRebuild && console.clear()
 
     if (childProcess?.killed && !hasError) {
       createChildProcess()
