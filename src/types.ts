@@ -1,4 +1,4 @@
-import { ComponentType, default as React } from 'react'
+import { ComponentType, HTMLAttributes } from 'react'
 import { IncomingMessage, ServerResponse } from 'http'
 
 export interface RenderOptions {
@@ -12,7 +12,7 @@ export interface Route {
   component: ComponentType<any>
 }
 
-export interface AppProps<PageProps = any> {
+export interface AppProps<PageProps = {}> {
   Component: ComponentType<any> | null
   pageProps: PageProps
 }
@@ -32,19 +32,21 @@ export interface GetInitialPropsParams {
   req?: IncomingMessage
 }
 
-export interface LinkProps extends React.HTMLAttributes<HTMLAnchorElement> {
+export interface LinkProps extends HTMLAttributes<HTMLAnchorElement> {
   to: string
 }
 
 export type AppComponentType = ComponentType<AppProps>
 
+type GetInitialPropsFn<P> = (...args: any[]) => P extends AppProps ? P['pageProps'] : P
+
 declare global {
   namespace React {
-    interface ComponentClass {
-      getInitialProps?: (...args: any[]) => any
+    interface ComponentClass<P = {}> {
+      getInitialProps?: GetInitialPropsFn<P>
     }
-    interface FunctionComponent {
-      getInitialProps?: (...args: any[]) => any
+    interface FunctionComponent<P = {}> {
+      getInitialProps?: GetInitialPropsFn<P>
     }
   }
 
