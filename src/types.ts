@@ -12,7 +12,7 @@ export interface Route {
   component: ComponentType<any>
 }
 
-export interface AppProps<PageProps = {}> {
+export interface AppProps<PageProps = any> {
   Component: ComponentType<any> | null
   pageProps: PageProps
 }
