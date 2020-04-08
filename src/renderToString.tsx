@@ -10,8 +10,7 @@ import Root from 'src/Root'
 import DefaultApp from 'src/App'
 
 const config = getConfig()
-const htmlPath = config.isDev ? config.htmlTemplatePath : config.builtHTMLPath
-const template = fs.readFileSync(htmlPath, 'utf8')
+const template = fs.readFileSync(config.builtHTMLPath, 'utf8')
 
 function writeDataToHTML($: CheerioStatic, pageProps: object) {
   const data = JSON.stringify({
@@ -31,15 +30,6 @@ function writeDataToHTML($: CheerioStatic, pageProps: object) {
           window.__APP_DATA__ = ${data}
       </script>`
     )
-  }
-}
-
-function appendScriptOnDevelop($: CheerioStatic) {
-  if (config.isDev) {
-    const scriptUrl = config.publicPath + 'app.js'
-    $('body').append(`
-      <script type="text/javascript" src="${scriptUrl}"></script>
-    `)
   }
 }
 
@@ -71,7 +61,6 @@ export async function renderToString(
     />
   )
   $(options.container).html(content)
-  appendScriptOnDevelop($)
   writeDataToHTML($, initialProps)
   return $.html()
 }

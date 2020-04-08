@@ -4,6 +4,7 @@ import webpack from 'webpack'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import HTMLWebpackPlugin from 'html-webpack-plugin'
 import TerserWebpackPlugin from 'terser-webpack-plugin'
+import InterpolateHtmlPlugin from './InterpolateHtmlPlugin'
 import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin'
 // @ts-ignore
 import HTMLWebpackInlineSourcePlugin from 'html-webpack-inline-source-plugin'
@@ -34,7 +35,7 @@ export function createWebpackConfig(isServer: boolean): webpack.Configuration {
     },
     output: {
       path: path.join(config.distDir, isServer ? 'server' : 'client'),
-      publicPath: isServer ? '/' : config.publicPath,
+      publicPath: config.publicPath,
       filename: (!isServer && !config.isDev) ? 'js/[name].[chunkhash:5].js' : '[name].js',
       chunkFilename: (!isServer && !config.isDev) ? 'js/[name].[chunkhash:5].chunk.js' : '[name].chunk.js',
       libraryTarget: isServer ? 'commonjs' : 'umd',
@@ -120,7 +121,7 @@ function mergeConfig(
       return config.configureWebpack(webpackConfig, isServer, config)
     }
 
-    return webpackMerge(webpackConfig, config.configureWebpack)
+    return webpackMerge.smart(webpackConfig, config.configureWebpack)
   }
 
   return webpackConfig
@@ -143,12 +144,21 @@ function getPlugins(isServer: boolean, config: Config): webpack.Plugin[] {
   const envVariables = getEnvVariables(config)
 
   const plugins: webpack.Plugin[] = [
-    new webpack.DefinePlugin(envVariables)
+    new webpack.DefinePlugin(envVariables.stringified),
   ]
 
   if (isServer || !config.isDev) {
     plugins.push(
       getProgressPlugin()
+    )
+  }
+  if (isServer && config.isDev) {
+    plugins.push(
+      new HTMLWebpackPlugin({
+        template: config.htmlTemplatePath,
+        filename: config.builtHTMLPath,
+      }) as any,
+      new InterpolateHtmlPlugin(envVariables.raw),
     )
   }
 
@@ -163,7 +173,8 @@ function getPlugins(isServer: boolean, config: Config): webpack.Plugin[] {
         filename: config.builtHTMLPath,
         // 将 runtime.[hash].js 内联引入
         inlineSource: /runtime.(\w)*\.js$/,
-      }),
+      }) as any,
+      new InterpolateHtmlPlugin(envVariables.raw),
       new HTMLWebpackInlineSourcePlugin()
     )
   }
@@ -288,16 +299,23 @@ function getEnvVariables(config: Config) {
 
   const variables = Object.keys(process.env)
     .reduce((variables, envKey) => {
-      if (envKey.includes('APP_')) {
+      if (envKey.startsWith('APP_')) {
         variables[envKey] = process.env[envKey] as string
       }
       return variables
-    }, { NODE_ENV: process.env.NODE_ENV, PORT: config.port } as Record<string, string | number>)
+    }, { 
+      NODE_ENV: process.env.NODE_ENV, 
+      PORT: config.port,
+      PUBLIC_URL: config.publicPath || '/',
+    } as Record<string, string | number>)
 
   return {
-    'process.env': Object.keys(variables).reduce((env, key) => {
-      env[key] = JSON.stringify(variables[key])
-      return env
-    }, {} as Record<string, string>)
+    stringified: {
+      'process.env': Object.keys(variables).reduce((env, key) => {
+        env[key] = JSON.stringify(variables[key])
+        return env
+      }, {} as Record<string, string>)
+    },
+    raw: variables,
   }
 }
