@@ -152,3 +152,22 @@ app.use(router)
 
 app.listen(3000)
 ```
+
+* HTML 模板变量
+
+默认注入 `NODE_ENV`、`PORT`、`PUBLIC_URL(webpack.output.publicPath)` 和 APP_XXX 等自定义的变量
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>%APP_TITLE%</title>
+</head>
+<body>
+  <div id="root"></div>
+</body>
+</html>
+```
