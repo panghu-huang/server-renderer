@@ -38,7 +38,10 @@ export interface LinkProps extends HTMLAttributes<HTMLAnchorElement> {
 
 export type AppComponentType = ComponentType<AppProps>
 
-type GetInitialPropsFn<P> = (...args: any[]) => P extends AppProps ? P['pageProps'] : P
+type GetInitialPropsFnResult<Props> = Partial<Props extends AppProps ? Props['pageProps'] : Props>
+
+type GetInitialPropsFn<P> = (...args: any[]) => 
+  GetInitialPropsFnResult<P> | Promise<GetInitialPropsFnResult<P>>
 
 declare global {
   namespace React {

@@ -4,15 +4,15 @@ import webpack from 'webpack'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import HTMLWebpackPlugin from 'html-webpack-plugin'
 import TerserWebpackPlugin from 'terser-webpack-plugin'
-import InterpolateHtmlPlugin from './InterpolateHtmlPlugin'
 import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin'
 // @ts-ignore
-import HTMLWebpackInlineSourcePlugin from 'html-webpack-inline-source-plugin'
-// @ts-ignore
 import safePostCSSParser from 'postcss-safe-parser'
+import InlineChunkHTMLPlugin from 'react-dev-utils/InlineChunkHtmlPlugin'
+import InterpolateHTMLPlugin from 'react-dev-utils/InterpolateHtmlPlugin'
 import nodeExternals from 'webpack-node-externals'
 import webpackMerge from 'webpack-merge'
 import ora from 'ora'
+import HTMLAttributePlugin from './HTMLAttributePlugin'
 import { getConfig, Config } from './config'
 
 export function createWebpackConfig(isServer: boolean): webpack.Configuration {
@@ -158,7 +158,8 @@ function getPlugins(isServer: boolean, config: Config): webpack.Plugin[] {
         template: config.htmlTemplatePath,
         filename: config.builtHTMLPath,
       }) as any,
-      new InterpolateHtmlPlugin(envVariables.raw),
+      new InterpolateHTMLPlugin(HTMLWebpackPlugin, envVariables.raw as any),
+      new HTMLAttributePlugin(config.htmlAttributes),
     )
   }
 
@@ -174,8 +175,9 @@ function getPlugins(isServer: boolean, config: Config): webpack.Plugin[] {
         // 将 runtime.[hash].js 内联引入
         inlineSource: /runtime.(\w)*\.js$/,
       }) as any,
-      new InterpolateHtmlPlugin(envVariables.raw),
-      new HTMLWebpackInlineSourcePlugin()
+      new InterpolateHTMLPlugin(HTMLWebpackPlugin, envVariables.raw as any),
+      new HTMLAttributePlugin(config.htmlAttributes),
+      new InlineChunkHTMLPlugin(HTMLWebpackPlugin, [/runtime.(\w)*\.js$/])
     )
   }
   return plugins

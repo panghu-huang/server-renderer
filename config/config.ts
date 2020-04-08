@@ -14,6 +14,10 @@ export interface Config {
   cleanConsoleOnRebuild: boolean
   decodeEntities: boolean
   sassData: string | null
+  htmlAttributes: {
+    script?: object
+    style?: object
+  }
   configureWebpack?: webpack.Configuration 
     | ((webpackConfig: webpack.Configuration, isServer: boolean, config: Config) => webpack.Configuration)
 }
@@ -33,6 +37,7 @@ export const getConfig = (): Config => {
     cleanConsoleOnRebuild: true,
     decodeEntities: false,
     sassData: null,
+    htmlAttributes: {},
   }
 
   const customConfigPath = path.resolve(defaultConfig.rootDir, 'ssr.config.js')
