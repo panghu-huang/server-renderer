@@ -51,7 +51,7 @@ function runCompile(configs: webpack.Configuration[]) {
       return
     }
     config.cleanConsoleOnRebuild && console.clear()
-    logSuccess('compiling...')
+    logSuccess('Compiling...')
   })
 
   compiler.watch({ignored: /node_modules/}, (err: Error, stats: any) => {
@@ -105,14 +105,14 @@ function build() {
   const clientDevConfig = createWebpackConfig(false)
 
   // clear output directory and copy static files.
-  const serverOutput = serverDevConfig.output?.path as string
+  // const serverOutput = serverDevConfig.output?.path as string
   const clientOutput = clientDevConfig.output?.path as string
   deleteDir(config.distDir)
 
   // create output directory
   fs.mkdirSync(config.distDir)
   const publicDir = path.join(config.rootDir, 'public')
-  copyDir(publicDir, serverOutput)
+  // copyDir(publicDir, serverOutput)
   copyDir(publicDir, clientOutput)
 
   runCompile([serverDevConfig, clientDevConfig])

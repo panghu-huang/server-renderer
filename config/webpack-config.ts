@@ -55,31 +55,7 @@ export function createWebpackConfig(isServer: boolean): webpack.Configuration {
           test: /\.(t|j)sx?$/,
           include: resolveAppPath('src'),
           loader: require.resolve('babel-loader'),
-          options: {
-            plugins: [
-              require.resolve('@babel/plugin-proposal-class-properties'),
-              [
-                require.resolve('@babel/plugin-transform-runtime'),
-                {
-                  helpers: true,
-                  regenerator: true,
-                  useESModules: false
-                }
-              ]
-            ],
-            presets: [
-              require.resolve('@babel/preset-react'),
-              require.resolve('@babel/preset-env'),
-              [
-                require.resolve('@babel/preset-typescript'),
-                {
-                  isTSX: true,
-                  allExtensions: true,
-                  allowNamespaces: false,
-                }
-              ],
-            ],
-          }
+          options: getBabelLoaderOptions(isServer),
         },
         {
           test: /\.s?css$/,
@@ -125,6 +101,39 @@ function mergeConfig(
   }
 
   return webpackConfig
+}
+
+function getBabelLoaderOptions(isServer: boolean) {
+  const presets = [
+    require.resolve('@babel/preset-react'),
+    [
+      require.resolve('@babel/preset-typescript'),
+      {
+        isTSX: true,
+        allExtensions: true,
+        allowNamespaces: false,
+      }
+    ],
+  ]
+  if (!isServer) {
+    presets.push(require.resolve('@babel/preset-env'))
+  }
+  return {
+    plugins: isServer
+      ? [require.resolve('@babel/plugin-proposal-class-properties')]
+      : [
+        require.resolve('@babel/plugin-proposal-class-properties'),
+        [
+          require.resolve('@babel/plugin-transform-runtime'),
+          {
+            helpers: true,
+            regenerator: true,
+            useESModules: false,
+          },
+        ],
+      ],
+    presets,
+  }
 }
 
 function getProgressPlugin() {
@@ -275,9 +284,7 @@ function getStyleLoaders(isServer: boolean, isModule: boolean, config: Config): 
   loaders.push({
     loader: require.resolve('sass-loader'),
     options: {
-      sassOptions: {
-        data: config.sassData,
-      },
+      prependData: config.sassData || '',
       sourceMap: useSourceMap,
     }
   })
@@ -296,6 +303,12 @@ function getEnvVariables(config: Config) {
       }
       const [key, value] = line.split('=')
       process.env[key] = value
+    })
+  }
+
+  if (config.env && typeof config.env === 'object') {
+    Object.keys(config.env).forEach(key => {
+      process.env[key] = config.env[key]
     })
   }
 

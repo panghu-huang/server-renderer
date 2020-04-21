@@ -11,7 +11,7 @@ export const history: History
 
 export function useLocation(): Location<any>
 
-export function useParams<T extends object>(): T
+export function useParams<T extends { [K in keyof T]?: string } = {}>(): T
 
 export function renderToString(req: IncomingMessage, res: ServerResponse, url: string, options: RenderOptions): Promise<string>
 

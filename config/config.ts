@@ -13,11 +13,12 @@ export interface Config {
   builtHTMLPath: string
   cleanConsoleOnRebuild: boolean
   decodeEntities: boolean
-  sassData: string | null
+  sassData: string
   htmlAttributes: {
     script?: object
     style?: object
   }
+  env: { [key: string]: string }
   configureWebpack?: webpack.Configuration 
     | ((webpackConfig: webpack.Configuration, isServer: boolean, config: Config) => webpack.Configuration)
 }
@@ -36,7 +37,8 @@ export const getConfig = (): Config => {
     publicPath: '/public/',
     cleanConsoleOnRebuild: true,
     decodeEntities: false,
-    sassData: null,
+    sassData: '',
+    env: {},
     htmlAttributes: {},
   }
 

@@ -44,6 +44,14 @@ type GetInitialPropsFn<P> = (...args: any[]) =>
   GetInitialPropsFnResult<P> | Promise<GetInitialPropsFnResult<P>>
 
 declare global {
+
+  namespace NodeJS {
+    interface ProcessEnv {
+      NODE_ENV: string
+      PUBLIC_URL: string
+    }
+  }
+
   namespace React {
     interface ComponentClass<P = {}> {
       getInitialProps?: GetInitialPropsFn<P>

@@ -61,14 +61,14 @@ async function build() {
     const serverConfig = createWebpackConfig(true)
 
     // clear output directory and copy static files
-    const serverOutput = serverConfig.output?.path as string
+    // const serverOutput = serverConfig.output?.path as string
     const clientOutput = clientConfig.output?.path as string
     deleteDir(config.distDir)
 
     // create output directory
     fs.mkdirSync(config.distDir)
     const publicDir = path.join(config.rootDir, 'public')
-    copyDir(publicDir, serverOutput)
+    // copyDir(publicDir, serverOutput)
     copyDir(publicDir, clientOutput)
 
     logSuccess('Start to build server bundle...')
