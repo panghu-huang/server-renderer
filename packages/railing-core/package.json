@@ -1,0 +1,22 @@
+{
+  "name": "@railing/core",
+  "version": "1.0.0",
+  "main": "./lib/railing/railing-server.js",
+  "license": "MIT",
+  "types": "index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json -w"
+  },
+  "dependencies": {
+    "@railing/scripts": "^1.0.0",
+    "@railing/types": "^1.0.0",
+    "connect": "^3.7.0",
+    "ts-node": "^10.1.0"
+  },
+  "devDependencies": {
+    "@types/webpack-dev-middleware": "^5.0.2",
+    "webpack": "^5.49.0",
+    "webpack-dev-middleware": "^5.0.0"
+  }
+}

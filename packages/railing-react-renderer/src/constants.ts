@@ -1,0 +1,1 @@
+export const APP_CONTAINER_ID = '__RAILING_APP__'

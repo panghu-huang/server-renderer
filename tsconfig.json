@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "lib",
+    "allowJs": true,
+    "checkJs": false,
+    "allowSyntheticDefaultImports": false,
+    "alwaysStrict": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "importHelpers": true,
+    "noUnusedLocals": false,
+    "strictNullChecks": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "lib": ["es6", "dom"],
+    "jsx": "react",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "es6",
+    "paths": {
+      "@railing/scripts": ["./packages/railing-scripts/lib/*"],
+      "@railing/core/*": ["./packages/railing-core/lib/*"],
+      "@railing/types": ["./packages/railing-types/*"],
+      "@railing/react-renderer/plugin": [
+        "./packages/railing-react-renderer/src/plugin/index.ts"
+      ],
+      "@railing/react-renderer": ["./packages/railing-react-renderer/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "lib"]
+}
